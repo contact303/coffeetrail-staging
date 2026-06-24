@@ -98,7 +98,7 @@ function ct_register_send_otp_email( $email, $code ) {
 		$message = ob_get_clean();
 	} else {
 		$message = sprintf(
-			'<div dir="rtl" style="font-family:Arial,sans-serif"><h2>אימות כתובת האימייל</h2><p>קוד האימות שלך הוא:</p><p style="font-size:32px;font-weight:700;letter-spacing:8px;direction:ltr;text-align:center">%s</p><p>הקוד תקף למשך 10 דקות.</p></div>',
+			'<div dir="rtl" style="font-family:Arial,sans-serif"><h2> 2אימות כתובת האימייל</h2><p>קוד האימות שלך הוא:</p><p style="font-size:32px;font-weight:700;letter-spacing:8px;direction:ltr;text-align:center">%s</p><p>הקוד תקף למשך 10 דקות.</p></div>',
 			esc_html( $code )
 		);
 	}
