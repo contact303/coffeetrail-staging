@@ -1,0 +1,1945 @@
+/*
+ * ct-wizard.css
+ *
+ * CoffeeTrail Multi-Step Wizard — layout, components, states.
+ *
+ * Design system colors (from Figma Z8TzfW2y9vAOg3HBlwXtuZ):
+ *   Primary green:  #00a63e
+ *   Error orange:   #f97316
+ *   Success teal:   #10b981
+ *   Idle border:    #d1d5db
+ *   Disabled:       bg #d1d5db (NOT opacity)
+ *   Font:           Inter
+ *
+ * RTL: direction is set on the outer wrapper; all layout uses logical
+ * properties where possible (margin-inline, padding-inline, etc.).
+ */
+
+/* ============================================================================
+   1. CSS Variables
+   ============================================================================ */
+
+:root {
+    /* Brand colors — extracted from Figma (Z8TzfW2y9vAOg3HBlwXtuZ),
+       validation palette aligned to node 1269-8. */
+    --cw-green:          #00a93e;
+    --cw-green-dark:     #008c35;
+    --cw-green-light:    #dcfce7;
+    --cw-green-bg:       #f6fef9;
+    --cw-success:        #109e81;
+    --cw-error:          #f97216;
+    --cw-error-light:    #fef3f2;
+    --cw-border-idle:    #d1d5db;
+    --cw-border-section: #e5e7eb;
+    --cw-border-focused: #00a93e;
+    --cw-border-valid:   #109e81;
+    --cw-border-error:   #f97216;
+    --cw-text:           #101828;
+    --cw-text-secondary: #4a5565;
+    --cw-text-muted:     #6b7280;
+    --cw-placeholder:    #9ca3af;
+    --cw-bg:             #ffffff;
+    --cw-radius:         14px;
+    --cw-radius-sm:      10px;
+    --cw-radius-lg:      16px;
+    --cw-shadow:         0 1px 1.5px rgba(0,0,0,.1), 0 1px 1px rgba(0,0,0,.1);
+    --cw-header-h:       96px;
+    --cw-footer-h:       97px;
+    --cw-content-max:    672px;
+    --cw-transition:     0.2s ease;
+}
+
+/* ============================================================================
+   2. Base & Layout
+   ============================================================================ */
+
+.ct-wizard-page {
+    min-height: 100vh;
+    background: #ffffff;
+    direction: rtl;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+    color: var(--cw-text);
+}
+
+/* Suppress any Elementor / theme content bleeds into wizard shell */
+.ct-wizard-page body,
+.ct-wizard-page .site-header,
+.ct-wizard-page .elementor-location-header,
+.ct-wizard-page [class*="elementor-popup"],
+.ct-wizard-page #wpadminbar {
+    display: none !important;
+}
+
+#ct-wizard-container {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    background: #ffffff;
+}
+
+#ct-wizard-step-content {
+    flex: 1;
+    padding: 32px 24px calc(var(--cw-footer-h) + 32px);
+    max-width: var(--cw-content-max);
+    width: 100%;
+    margin: 0 auto;
+}
+
+/* ============================================================================
+   3. Wizard Header
+   ============================================================================ */
+
+.ct-wizard-header {
+    /* NOT sticky — static so content flows naturally */
+    background: #ffffff;
+    border-bottom: 1px solid var(--cw-border-section);
+    height: var(--cw-header-h);
+    flex-shrink: 0;
+}
+
+.ct-wizard-header__inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: var(--cw-header-h);
+    padding: 0 24px;
+}
+
+/* ---- Logo badge (RIGHT side in RTL = first DOM child) ---- */
+.ct-wizard-header__logo-badge {
+    width: 48px;
+    height: 48px;
+    background: #000000;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    overflow: hidden;
+}
+
+.ct-wizard-header__logo-badge img {
+    width: 24px;
+    height: 24px;
+    display: block;
+}
+
+.ct-wizard-header__logo-badge .ct-wizard-logo-emoji {
+    font-size: 22px;
+    line-height: 1;
+}
+
+/* Legacy logo image (kept for fallback) */
+.ct-wizard-header__logo-img {
+    height: 32px;
+    display: block;
+}
+
+/* ---- Action buttons (LEFT side in RTL = last DOM child) ---- */
+.ct-wizard-header__actions {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.ct-wizard-header__save-exit-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    height: 38px;
+    padding: 0 16px;
+    border: 1px solid var(--cw-border-idle);
+    border-radius: 9999px;
+    background: none;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    color: #364153;
+    transition: background var(--cw-transition), border-color var(--cw-transition);
+    white-space: nowrap;
+    font-family: inherit;
+}
+
+.ct-wizard-header__save-exit-btn:hover {
+    background: #f9fafb;
+    border-color: #9ca3af;
+}
+
+.ct-wizard-header__questions-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    color: #4a5565;
+    padding: 0;
+    font-family: inherit;
+    transition: color var(--cw-transition);
+}
+
+.ct-wizard-header__questions-btn:hover {
+    color: var(--cw-text);
+}
+
+/* Progress bar — hidden by default per Figma design (no progress bar in header) */
+.ct-wizard-progress {
+    height: 4px;
+    background: #e5e7eb;
+    position: relative;
+    display: none; /* Figma shows no progress bar in header */
+}
+
+.ct-wizard-progress__bar {
+    height: 100%;
+    background: var(--cw-green);
+    transition: width 0.4s ease;
+    border-radius: 0 2px 2px 0;
+}
+
+/* ============================================================================
+   4. Wizard Footer
+   ============================================================================ */
+
+.ct-wizard-footer {
+    position: fixed;
+    bottom: 0;
+    right: 0;
+    left: 0;
+    z-index: 100;
+    background: #ffffff;
+    border-top: 1px solid var(--cw-border-section);
+    height: var(--cw-footer-h);
+    display: flex;
+    align-items: center;
+    flex-shrink: 0;
+}
+
+.ct-wizard-footer__inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    padding: 0 24px;
+    gap: 16px;
+}
+
+.ct-wizard-footer__message {
+    font-size: 14px;
+    color: var(--cw-text-secondary);
+    text-align: center;
+    flex: 1;
+}
+
+.ct-wizard-footer__nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    width: 100%;
+}
+
+/* ============================================================================
+   5. Buttons
+   ============================================================================ */
+
+.ct-wizard-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    cursor: pointer;
+    transition: background var(--cw-transition), color var(--cw-transition);
+    font-family: inherit;
+    white-space: nowrap;
+}
+
+/* Next / primary action — LEFT side visually (RTL end) */
+.ct-wizard-btn--next {
+    background: var(--cw-green);
+    color: #ffffff;
+    height: 48px;
+    min-width: 80px;
+    padding: 0 24px;
+    border-radius: var(--cw-radius-sm);
+    font-size: 16px;
+    font-weight: 500;
+}
+
+.ct-wizard-btn--next:hover:not(:disabled):not(.ct-wizard-btn--disabled) {
+    background: var(--cw-green-dark);
+}
+
+/* Disabled = green at 50% opacity (Figma: opacity 50%, keep green colour) */
+.ct-wizard-btn--next:disabled,
+.ct-wizard-btn--next.ct-wizard-btn--disabled {
+    background: var(--cw-green);
+    color: #ffffff;
+    cursor: not-allowed;
+    pointer-events: none;
+    opacity: 0.5;
+}
+
+/* Back button — RIGHT side visually (RTL start), plain text */
+.ct-wizard-btn--next {
+    order: 2; /* always leftmost in RTL: Back(-1) | Message(0) | Next(2) */
+}
+
+.ct-wizard-btn--back {
+    background: none;
+    color: var(--cw-text);
+    height: 48px;
+    padding: 0 4px;
+    font-size: 16px;
+    font-weight: 500;
+    border-radius: var(--cw-radius-sm);
+}
+
+.ct-wizard-btn--back:hover {
+    color: var(--cw-text-secondary);
+}
+
+.ct-wizard-footer__spacer {
+    display: block;
+    min-width: 80px;
+}
+
+/* ============================================================================
+   6. Step content: Typography
+   ============================================================================ */
+
+.ct-step {
+    padding-top: 8px;
+}
+
+/* Step heading — 30px semibold, tracking -0.75px (from Figma) */
+.ct-step__title {
+    font-size: 30px;
+    font-weight: 600;
+    color: var(--cw-text);
+    margin: 0 0 12px;
+    line-height: 1.2;
+    letter-spacing: -0.75px;
+    text-align: right;
+}
+
+.ct-step__subtitle {
+    font-size: 16px;
+    color: var(--cw-text-secondary);
+    margin: 0 0 32px;
+    line-height: 1.5;
+    text-align: right;
+}
+
+/* Section heading — 18px semibold */
+.ct-step__section-title {
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--cw-text);
+    margin: 28px 0 16px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    text-align: right;
+}
+
+/* ============================================================================
+   7. Form fields
+   ============================================================================ */
+
+.ct-field-group {
+    margin-bottom: 24px;
+}
+
+/* Field label — 16px semibold, right-aligned */
+.ct-field-label {
+    display: block;
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--cw-text);
+    margin-bottom: 12px;
+    text-align: right;
+}
+
+.ct-field-label--sub {
+    font-size: 14px;
+    font-weight: 400;
+    color: var(--cw-text-muted);
+    margin-bottom: 8px;
+    text-align: right;
+}
+
+.ct-field-label--required::after {
+    content: ' *';
+    color: var(--cw-error);
+}
+
+.ct-field-desc {
+    font-size: 14px;
+    color: var(--cw-text-muted);
+    margin-bottom: 12px;
+    line-height: 1.5;
+    text-align: right;
+}
+
+/* Input — 50px height, 14px border-radius (from Figma) */
+.ct-field {
+    width: 100%;
+    height: 50px;
+    padding: 0 16px;
+    font-size: 15px;
+    font-family: inherit;
+    border: 1px solid var(--cw-border-idle);
+    border-radius: var(--cw-radius);
+    background: #ffffff;
+    color: var(--cw-text);
+    outline: none;
+    transition: border-color var(--cw-transition), box-shadow var(--cw-transition), background var(--cw-transition);
+    direction: rtl;
+    text-align: right;
+    box-sizing: border-box;
+}
+
+.ct-field::placeholder,
+.ct-phone-input::placeholder {
+    color: var(--cw-placeholder);
+}
+
+/* Focused — green ring (from Figma: border + 2px shadow) */
+.ct-field:focus {
+    border-color: var(--cw-border-focused);
+    box-shadow: 0 0 0 2px var(--cw-green);
+    background: rgba(255,255,255,0);
+}
+
+/* Valid state — teal border + check glyph (Figma node 1269-8, state #3).
+   Inputs don't support ::after, so the check is a background SVG on the
+   leading (left, in RTL) edge. */
+.ct-field.ct-field--valid {
+    border-color: var(--cw-border-valid);
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23109e81' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M20 6L9 17l-5-5'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: left 14px center;
+    padding-left: 40px;
+}
+
+/* Error state — orange border + warm bg */
+.ct-field.ct-field--error {
+    border-color: var(--cw-border-error);
+    background: var(--cw-error-light);
+}
+
+.ct-field:disabled {
+    background: #f9fafb;
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* Textarea variant */
+.ct-field--textarea {
+    height: auto;
+    min-height: 100px;
+    padding: 12px 16px;
+    resize: vertical;
+}
+
+/* Error message below field */
+.ct-field-error {
+    font-size: 12px;
+    color: var(--cw-error);
+    margin-top: 6px;
+    display: block;
+    text-align: right;
+}
+
+/* Valid message below field */
+.ct-field-valid-msg {
+    font-size: 12px;
+    color: var(--cw-success);
+    margin-top: 6px;
+    display: block;
+    text-align: right;
+}
+
+/* Larger input variant (58px, 16px border-radius) used in address/URL */
+.ct-field--lg {
+    height: 58px;
+    border-radius: var(--cw-radius-lg);
+    font-size: 15px;
+}
+
+/* Phone input with prefix */
+.ct-phone-field {
+    display: flex;
+    align-items: center;
+    /* Phone numbers are LTR content. direction:ltr puts the +972 prefix on the
+       LEFT side of the input regardless of the page's RTL direction. */
+    direction: ltr;
+    border: 1px solid var(--cw-border-idle);
+    border-radius: var(--cw-radius-lg);
+    overflow: hidden;
+    background: #ffffff;
+    transition: border-color var(--cw-transition), box-shadow var(--cw-transition);
+    height: 58px;
+}
+
+.ct-phone-field:focus-within {
+    border-color: var(--cw-border-focused);
+    box-shadow: 0 0 0 2px var(--cw-green);
+}
+
+.ct-phone-field.ct-field--error {
+    border-color: var(--cw-border-error);
+    background: var(--cw-error-light);
+}
+
+.ct-phone-field.ct-field--valid {
+    border-color: var(--cw-border-valid);
+}
+
+/* ----------------------------------------------------------------------------
+   Location picker map (OSM/Leaflet)
+   ---------------------------------------------------------------------------- */
+#location-picker-map {
+    width: 100%;
+    height: 280px;
+    border-radius: var(--cw-radius);
+    margin-top: 8px;
+    margin-bottom: 4px;
+    overflow: hidden;
+    z-index: 0;
+}
+
+/* Logo pin marker (L.icon className) — a rounded logo badge */
+.ct-map-pin {
+    border-radius: 50%;
+    border: 3px solid #fff;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, .3);
+    object-fit: cover;
+    background: #fff;
+}
+
+@media (max-width: 600px) {
+    #location-picker-map {
+        height: 240px;
+    }
+}
+
+.ct-phone-prefix {
+    padding: 0 14px;
+    font-size: 14px;
+    color: var(--cw-text-secondary);
+    background: transparent;
+    border-right: 1px solid var(--cw-border-idle);
+    white-space: nowrap;
+    user-select: none;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-shrink: 0;
+}
+
+/* Prefix dropdown variant (Israeli dialing prefixes) */
+.ct-phone-prefix-select {
+    padding: 0 10px;
+    font-size: 14px;
+    font-family: inherit;
+    color: var(--cw-text-secondary);
+    background: transparent;
+    border: none;
+    border-right: 1px solid var(--cw-border-idle);
+    height: 100%;
+    flex-shrink: 0;
+    outline: none;
+    cursor: pointer;
+    direction: ltr;
+    text-align: center;
+    text-align-last: center;
+}
+
+.ct-phone-input {
+    flex: 1;
+    padding: 0 12px;
+    font-size: 15px;
+    font-family: inherit;
+    border: none;
+    outline: none;
+    background: transparent;
+    color: var(--cw-text);
+    direction: ltr;
+    text-align: left;
+    height: 100%;
+}
+
+/* Stacked radio rows (business type on the basics step) — reuses .ct-checkbox-item */
+.ct-radio-rows {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.ct-radio-rows.ct-field--error .ct-checkbox-item {
+    border-color: var(--cw-border-error);
+    background: var(--cw-error-light);
+}
+
+/* ============================================================================
+   8. Card selections / Visual card grid (cart-type step)
+      Figma node 1136:754 — 280×212px cards, icon on top, centred text
+   ============================================================================ */
+
+.ct-card-group {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 28px;
+}
+
+.ct-card-option {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    border: 2px solid #e5e7eb;
+    border-radius: 16px;
+    padding: 42px 26px;
+    min-height: 212px;
+    cursor: pointer;
+    transition: border-color var(--cw-transition);
+    background: #ffffff;
+    user-select: none;
+}
+
+.ct-card-option:hover {
+    border-color: var(--cw-border-idle);
+}
+
+.ct-card-option--selected {
+    border-color: var(--cw-green);
+}
+
+.ct-card-option input[type="radio"] {
+    position: absolute;
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+/* 64×64 rounded square with light-green tint */
+.ct-card-option__icon-wrap {
+    width: 64px;
+    height: 64px;
+    border-radius: 14px;
+    background: var(--cw-green-light);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.ct-card-option__icon-img {
+    width: 30px;
+    height: 30px;
+    display: block;
+}
+
+.ct-card-option__text {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    align-items: center;
+    text-align: center;
+}
+
+.ct-card-option__title {
+    font-size: 17px;
+    font-weight: 500;
+    color: var(--cw-text);
+    line-height: 24px;
+}
+
+.ct-card-option__desc {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--cw-text-muted);
+    line-height: 20px;
+}
+
+@media (max-width: 480px) {
+    .ct-card-group {
+        grid-template-columns: 1fr;
+    }
+    .ct-card-option {
+        min-height: 160px;
+        padding: 32px 24px;
+    }
+}
+
+/* ============================================================================
+   9. Checkboxes & Radios (Figma: pill buttons with 20px checkbox on start)
+   ============================================================================ */
+
+.ct-checkbox-group {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+/* 2-column grid used in perks/filters step */
+.ct-checkbox-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 20px;
+}
+
+/* Each checkbox row — pill style from Figma */
+.ct-checkbox-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    cursor: pointer;
+    padding: 0 13px;
+    height: 48px;
+    border: 1px solid var(--cw-border-section);
+    border-radius: var(--cw-radius);
+    transition: border-color var(--cw-transition), background var(--cw-transition);
+    user-select: none;
+    background: #ffffff;
+}
+
+.ct-checkbox-item:hover {
+    border-color: var(--cw-border-idle);
+}
+
+.ct-checkbox-item:has(input:checked) {
+    border-color: var(--cw-green);
+    background: var(--cw-green-light);
+}
+
+/* Validation error flare for a checkbox row (e.g. unaccepted terms on the
+   terms step). Mirrors the field error state — red border + warm background. */
+.ct-checkbox-item.ct-field--error {
+    border-color: var(--cw-border-error);
+    background: var(--cw-error-light);
+}
+
+.ct-checkbox-item.ct-field--error .ct-checkbox-item__label {
+    color: var(--cw-error);
+}
+
+/* Figma checkbox: 20px square, 4px radius, 2px border */
+.ct-checkbox-item input[type="checkbox"] {
+    width: 20px;
+    height: 20px;
+    border: 2px solid var(--cw-border-idle);
+    border-radius: 4px;
+    background: #ffffff;
+    flex-shrink: 0;
+    accent-color: var(--cw-green);
+    appearance: auto;
+    order: -1; /* on LEFT side in RTL (start of flex row) */
+    cursor: pointer;
+}
+
+.ct-checkbox-item input[type="radio"] {
+    width: 20px;
+    height: 20px;
+    flex-shrink: 0;
+    accent-color: var(--cw-green);
+    appearance: auto;
+    order: -1;
+    cursor: pointer;
+}
+
+.ct-checkbox-item__label {
+    font-size: 15px;
+    font-weight: 500;
+    color: var(--cw-text);
+    flex: 1;
+    text-align: right;
+}
+
+.ct-checkbox-item__desc {
+    font-size: 12px;
+    color: var(--cw-text-muted);
+    margin-top: 2px;
+    display: block;
+}
+
+/* Section heading inside checkbox groups */
+.ct-checkboxes-section {
+    margin-bottom: 28px;
+}
+
+.ct-checkboxes-section__title {
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--cw-text);
+    margin: 0 0 16px;
+    text-align: right;
+}
+
+/* ============================================================================
+   10. Upload zones
+   ============================================================================ */
+
+.ct-upload-field {
+    margin-bottom: 24px;
+}
+
+/* Upload zone — Figma: 2px dashed #d1d5db, 16px border-radius */
+.ct-upload-zone {
+    border: 2px dashed var(--cw-border-idle);
+    border-radius: var(--cw-radius-lg);
+    padding: 50px 50px;
+    text-align: center;
+    cursor: pointer;
+    transition: border-color var(--cw-transition), background var(--cw-transition);
+    background: #ffffff;
+    position: relative;
+    min-height: 180px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.ct-upload-zone:hover,
+.ct-upload-zone--dragover {
+    border-color: var(--cw-green);
+    background: var(--cw-green-light);
+}
+
+/* Upload icon circle — Figma: 48px green circle with icon */
+.ct-upload-zone__icon-wrap {
+    width: 48px;
+    height: 48px;
+    background: var(--cw-green-light);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 8px;
+    flex-shrink: 0;
+}
+
+.ct-upload-zone__icon {
+    font-size: 24px;
+    display: block;
+}
+
+.ct-upload-zone__title {
+    font-size: 16px;
+    font-weight: 500;
+    color: var(--cw-text);
+    display: block;
+}
+
+.ct-upload-zone__hint {
+    font-size: 14px;
+    color: var(--cw-text-muted);
+    font-weight: 500;
+}
+
+.ct-upload-input {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    width: 100%;
+    height: 100%;
+    cursor: pointer;
+}
+
+/* Gallery thumbnails — horizontal, drag-to-reorder row */
+.ct-upload-previews {
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 10px;
+    margin-top: 12px;
+    overflow-x: auto;
+    padding-bottom: 6px;
+    -webkit-overflow-scrolling: touch;
+}
+
+.ct-upload-previews .ct-upload-preview {
+    flex: 0 0 auto;
+    cursor: grab;
+}
+
+.ct-upload-previews .ct-upload-preview:active {
+    cursor: grabbing;
+}
+
+/* SortableJS drag states */
+.ct-upload-preview.sortable-chosen {
+    box-shadow: 0 0 0 2px var(--cw-green);
+}
+
+.ct-upload-preview.sortable-ghost {
+    opacity: 0.4;
+}
+
+.ct-upload-preview {
+    position: relative;
+    width: 80px;
+    height: 80px;
+    border-radius: var(--cw-radius-sm);
+    overflow: hidden;
+    background: #F3F4F6;
+}
+
+.ct-upload-preview img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.ct-upload-remove {
+    position: absolute;
+    top: 3px;
+    left: 3px;
+    width: 20px;
+    height: 20px;
+    background: rgba(0,0,0,.55);
+    color: #fff;
+    border: none;
+    border-radius: 50%;
+    font-size: 13px;
+    line-height: 1;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.ct-gallery-counter {
+    font-size: 13px;
+    color: var(--cw-text-muted);
+    margin-top: 6px;
+    display: block;
+}
+
+/* Upload processing spinner */
+.ct-upload-spinner {
+    position: fixed;
+    bottom: calc(var(--cw-footer-h) + 12px);
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0,0,0,.75);
+    color: #fff;
+    padding: 8px 18px;
+    border-radius: 20px;
+    font-size: 13px;
+    z-index: 200;
+    display: none;
+}
+
+/* ============================================================================
+   11. Crop overlay
+   ============================================================================ */
+
+.ct-crop-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,.8);
+    z-index: 500;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+}
+
+.ct-crop-inner {
+    background: var(--cw-bg);
+    border-radius: var(--cw-radius);
+    padding: 20px;
+    max-width: 560px;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.ct-crop-inner img {
+    max-height: 380px;
+    width: 100%;
+    object-fit: contain;
+    display: block;
+}
+
+.ct-crop-actions {
+    display: flex;
+    gap: 12px;
+    justify-content: flex-end;
+}
+
+/* ============================================================================
+   12. Modals
+   ============================================================================ */
+
+.ct-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 400;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+.ct-modal[hidden] {
+    display: none;
+}
+
+.ct-modal__backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(0,0,0,.5);
+    cursor: pointer;
+}
+
+.ct-modal__box {
+    position: relative;
+    background: var(--cw-bg);
+    border-radius: var(--cw-radius);
+    padding: 32px;
+    max-width: 440px;
+    width: 100%;
+    box-shadow: var(--cw-shadow);
+    text-align: center;
+    direction: rtl;
+    z-index: 1;
+}
+
+.ct-modal__box--help {
+    text-align: right;
+}
+
+.ct-modal__close {
+    position: absolute;
+    top: 14px;
+    left: 14px;
+    width: 28px;
+    height: 28px;
+    background: none;
+    border: none;
+    font-size: 20px;
+    cursor: pointer;
+    color: var(--cw-text-muted);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: background var(--cw-transition);
+}
+
+.ct-modal__close:hover {
+    background: #F3F4F6;
+}
+
+.ct-modal__icon {
+    font-size: 40px;
+    margin-bottom: 12px;
+}
+
+.ct-modal__title {
+    font-size: 20px;
+    font-weight: 700;
+    margin: 0 0 10px;
+}
+
+.ct-modal__subtitle,
+.ct-modal__body {
+    font-size: 14px;
+    color: var(--cw-text-muted);
+    margin: 0 0 20px;
+    line-height: 1.5;
+}
+
+.ct-modal__actions {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.ct-modal__contact-list {
+    list-style: none;
+    padding: 0;
+    margin: 16px 0;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.ct-modal__contact-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    font-size: 14px;
+}
+
+.ct-modal__contact-icon {
+    font-size: 20px;
+    flex-shrink: 0;
+}
+
+.ct-modal__note {
+    font-size: 12px;
+    color: var(--cw-text-muted);
+    display: block;
+    margin-top: 2px;
+}
+
+.ct-modal__hours {
+    font-size: 13px;
+    color: var(--cw-text-muted);
+    margin-top: 16px;
+}
+
+body.ct-modal-open {
+    overflow: hidden;
+}
+
+/* ============================================================================
+   13. Step-specific: Intro screens (two-column, from Figma Phase 1/2/3 title screens)
+   ============================================================================ */
+
+/* Two-column intro layout: image LEFT, text RIGHT in RTL */
+.ct-intro-screen {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 48px;
+    min-height: calc(100vh - var(--cw-header-h) - var(--cw-footer-h) - 64px);
+    padding: 32px 0;
+}
+
+/* Image column — LEFT side. In RTL flex, higher order = leftmost. */
+.ct-intro-screen__image-col {
+    flex: 0 0 46%;
+    order: 1; /* LEFT in RTL (higher = leftmost) */
+}
+
+.ct-intro-screen__image {
+    width: 100%;
+    aspect-ratio: 3/2;
+    object-fit: cover;
+    border-radius: var(--cw-radius-lg);
+    display: block;
+    background: var(--cw-border-idle);
+}
+
+/* Text column — RIGHT side */
+.ct-intro-screen__text-col {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    text-align: right;
+}
+
+.ct-intro-screen__step-label {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--cw-text-muted);
+    letter-spacing: 0.3px;
+}
+
+.ct-intro-screen__title {
+    font-size: 44px;
+    font-weight: 600;
+    color: var(--cw-text);
+    line-height: 1.15;
+    letter-spacing: -1.1px;
+    margin: 0;
+}
+
+.ct-intro-screen__subtitle {
+    font-size: 17px;
+    color: var(--cw-text-secondary);
+    line-height: 1.6;
+    margin: 0;
+}
+
+/* Status badge (Phase 2: "אתם כבר על המפה") */
+.ct-intro-screen__badge {
+    display: flex;
+    align-items: flex-start;
+    gap: 0;
+    background: var(--cw-green-bg);
+    border-radius: var(--cw-radius-sm);
+    padding: 14px 16px;
+    max-width: 340px;
+    align-self: flex-end; /* right side of text column */
+}
+
+.ct-intro-screen__badge-title {
+    font-size: 15px;
+    font-weight: 600;
+    color: #065f46;
+    margin: 0 0 4px;
+    text-align: right;
+}
+
+.ct-intro-screen__badge-body {
+    font-size: 14px;
+    color: #059669;
+    line-height: 1.5;
+    margin: 0;
+    text-align: right;
+}
+
+/* ── Per-step overrides ── */
+
+/* Intro-1: dark step label */
+.ct-intro-screen--1 .ct-intro-screen__step-label {
+    font-size: 13px;
+    color: var(--cw-text);
+    letter-spacing: 0.325px;
+}
+
+/* Intro-2: larger title + subtitle */
+.ct-intro-screen--2 .ct-intro-screen__title {
+    font-size: 48px;
+    letter-spacing: -1.2px;
+}
+.ct-intro-screen--2 .ct-intro-screen__subtitle {
+    font-size: 18px;
+}
+.ct-intro-screen--2 .ct-intro-screen__badge {
+    padding: 12px 16px;
+}
+
+/* Intro-3: bold title, smaller subtitle */
+.ct-intro-screen--3 .ct-intro-screen__title {
+    font-size: 42px;
+    font-weight: 700;
+    letter-spacing: -0.7px;
+}
+.ct-intro-screen--3 .ct-intro-screen__subtitle {
+    font-size: 16px;
+    letter-spacing: -0.31px;
+}
+.ct-intro-screen--3 .ct-intro-screen__badge {
+    background: #f0fdf4;
+    border: 1px solid #b9f8cf;
+    border-radius: 14px;
+}
+.ct-intro-screen--3 .ct-intro-screen__badge-title {
+    color: #0d542b;
+}
+.ct-intro-screen--3 .ct-intro-screen__badge-body {
+    color: #15803d;
+}
+
+/* Image card wrapper (intro-2 and intro-3) */
+.ct-intro-screen__image-card {
+    background: #fff;
+    border-radius: var(--cw-radius-lg);
+    overflow: hidden;
+}
+.ct-intro-screen--2 .ct-intro-screen__image-card {
+    box-shadow: 0 10px 15px -3px rgba(0,0,0,.10), 0 4px 6px -4px rgba(0,0,0,.10);
+}
+.ct-intro-screen--3 .ct-intro-screen__image-card {
+    padding: 16px;
+    box-shadow: 0 4px 10px rgba(0,0,0,.08);
+}
+.ct-intro-screen--3 .ct-intro-screen__image-card .ct-intro-screen__image {
+    border-radius: 14px;
+}
+
+/* Intro-3 reversed: image on RIGHT, text on LEFT */
+.ct-intro-screen--reversed .ct-intro-screen__image-col {
+    order: 0; /* RIGHT in RTL (0 < text order:1, so image is rightmost) */
+}
+.ct-intro-screen--reversed .ct-intro-screen__text-col {
+    order: 1; /* LEFT in RTL (higher order = leftmost) */
+    text-align: right;
+}
+
+/* Stacked fallback for mobile / small screens */
+@media (max-width: 720px) {
+    .ct-intro-screen {
+        flex-direction: column-reverse;
+        gap: 24px;
+        min-height: auto;
+    }
+    .ct-intro-screen--reversed {
+        flex-direction: column-reverse;
+    }
+    .ct-intro-screen__image-col {
+        flex: none;
+        width: 100%;
+        order: 0;
+    }
+    .ct-intro-screen__title {
+        font-size: 32px;
+    }
+}
+
+/* ============================================================================
+   14. Step-specific: Hours
+   ============================================================================ */
+
+.ct-hours-banner {
+    background: var(--cw-green-light);
+    color: var(--cw-green);
+    border: 1px solid var(--cw-green);
+    border-radius: var(--cw-radius-sm);
+    padding: 10px 14px;
+    font-size: 14px;
+    font-weight: 500;
+    margin-bottom: 20px;
+}
+
+.ct-hours-divider {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin: 20px 0;
+    color: var(--cw-text-muted);
+    font-size: 13px;
+}
+
+.ct-hours-divider::before,
+.ct-hours-divider::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: #E5E7EB;
+}
+
+/* Per-day rows */
+.ct-hours-rows {
+    display: flex;
+    flex-direction: column;
+}
+
+.ct-hours-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 0;
+    border-bottom: 1px solid #f3f4f6;
+    direction: rtl;
+}
+
+.ct-hours-row__label {
+    min-width: 28px;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--cw-text);
+    text-align: right;
+}
+
+/* iOS-style toggle switch */
+.ct-toggle-switch {
+    position: relative;
+    display: inline-block;
+    width: 44px;
+    height: 26px;
+    flex-shrink: 0;
+}
+.ct-toggle-switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+    position: absolute;
+}
+.ct-toggle-slider {
+    position: absolute;
+    inset: 0;
+    background: #d1d5db;
+    border-radius: 26px;
+    cursor: pointer;
+    transition: background .2s;
+}
+.ct-toggle-slider::before {
+    content: '';
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    left: 3px;
+    top: 3px;
+    background: #fff;
+    border-radius: 50%;
+    transition: transform .2s;
+    box-shadow: 0 1px 3px rgba(0,0,0,.15);
+}
+.ct-toggle-switch input:checked + .ct-toggle-slider {
+    background: var(--cw-green);
+}
+.ct-toggle-switch input:checked + .ct-toggle-slider::before {
+    transform: translateX(18px);
+}
+
+/* Inline times */
+.ct-hours-row__times {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex: 1;
+    direction: rtl;
+}
+
+.ct-hours-row__time-label {
+    font-size: 13px;
+    color: var(--cw-text-muted);
+    white-space: nowrap;
+}
+
+.ct-hours-time-input {
+    width: 108px;
+    height: 40px;
+    border: 1px solid var(--cw-border-idle);
+    border-radius: var(--cw-radius-sm);
+    padding: 0 10px;
+    font-size: 15px;
+    font-family: inherit;
+    color: var(--cw-text);
+    background: #fff;
+    direction: ltr;
+    text-align: center;
+}
+.ct-hours-time-input:focus {
+    outline: none;
+    border-color: var(--cw-green);
+    box-shadow: 0 0 0 3px rgba(0,166,62,.12);
+}
+
+.ct-hours-row__dash {
+    color: var(--cw-text-muted);
+    font-size: 14px;
+}
+
+.ct-hours-row__closed {
+    flex: 1;
+    font-size: 14px;
+    color: var(--cw-text-muted);
+    text-align: left;
+}
+
+@media (max-width: 640px) {
+    .ct-hours-row {
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+    .ct-hours-row__times {
+        flex-wrap: wrap;
+    }
+    .ct-hours-time-input {
+        width: 90px;
+    }
+}
+
+/* ============================================================================
+   15. Step-specific: Payment
+   ============================================================================ */
+
+.ct-payment-layout {
+    display: grid;
+    grid-template-columns: 1fr 1.5fr;
+    gap: 24px;
+    align-items: start;
+}
+
+.ct-order-summary {
+    background: #F9FAFB;
+    border: 1px solid #E5E7EB;
+    border-radius: var(--cw-radius);
+    padding: 20px;
+}
+
+.ct-order-summary__title {
+    font-size: 15px;
+    font-weight: 700;
+    margin: 0 0 14px;
+}
+
+.ct-order-line {
+    display: flex;
+    justify-content: space-between;
+    font-size: 14px;
+    padding: 6px 0;
+    border-bottom: 1px solid #E5E7EB;
+}
+
+.ct-order-total {
+    display: flex;
+    justify-content: space-between;
+    font-size: 16px;
+    font-weight: 700;
+    padding-top: 10px;
+    margin-top: 4px;
+}
+
+.ct-order-info-box {
+    background: var(--cw-green-light);
+    border-radius: var(--cw-radius-sm);
+    padding: 10px 12px;
+    font-size: 12px;
+    color: var(--cw-green);
+    margin-top: 14px;
+}
+
+.ct-plan-option {
+    border: 2px solid var(--cw-border-idle);
+    border-radius: var(--cw-radius-sm);
+    padding: 14px;
+    margin-bottom: 10px;
+    cursor: pointer;
+    transition: border-color var(--cw-transition), background var(--cw-transition);
+}
+
+.ct-plan-option--selected {
+    border-color: var(--cw-green);
+    background: var(--cw-green-light);
+}
+
+.ct-plan-option--disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
+.ct-plan-option__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 4px;
+}
+
+.ct-plan-badge {
+    font-size: 11px;
+    font-weight: 600;
+    padding: 2px 8px;
+    border-radius: 20px;
+    background: #E5E7EB;
+    color: var(--cw-text-muted);
+}
+
+.ct-plan-badge--soon {
+    background: #FEF3C7;
+    color: #92400E;
+}
+
+/* ============================================================================
+   16. Step-specific: Success
+   ============================================================================ */
+
+/* ============================================================================
+   Success / Completion Screen — Figma 1368:182 (free) / 1369:209 (pro)
+   ============================================================================ */
+
+.ct-success-screen {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    min-height: 100vh;
+    padding: 48px 24px;
+}
+
+/* Black 64×64 logo badge, coffee emoji centred inside */
+.ct-success-screen__logo {
+    width: 64px;
+    height: 64px;
+    background: #000;
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 32px;
+}
+
+.ct-success-screen__logo-emoji {
+    font-size: 32px;
+    line-height: 1;
+}
+
+.ct-success-screen__title {
+    font-size: 36px;
+    font-weight: 700;
+    color: var(--cw-text);
+    letter-spacing: -0.53px;
+    margin: 0 0 24px;
+    line-height: 1.25;
+}
+
+.ct-success-screen__subtitle {
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--cw-text);
+    letter-spacing: -0.45px;
+    margin: 0 0 16px;
+    max-width: 480px;
+}
+
+.ct-success-screen__body {
+    font-size: 16px;
+    font-weight: 400;
+    color: var(--cw-text);
+    line-height: 1.6;
+    letter-spacing: -0.31px;
+    max-width: 560px;
+    margin: 0 0 24px;
+}
+
+.ct-success-screen__note {
+    font-size: 14px;
+    color: var(--cw-text-muted);
+    letter-spacing: -0.15px;
+    margin: 0 0 40px;
+}
+
+/* Teal CTA button — #10b981 per Figma */
+.ct-success-screen__cta {
+    display: block;
+    width: 100%;
+    max-width: 400px;
+    height: 50px;
+    background: #10b981;
+    color: #fff;
+    font-size: 15px;
+    font-weight: 600;
+    letter-spacing: -0.23px;
+    text-decoration: none;
+    border-radius: 10px;
+    line-height: 50px;
+    text-align: center;
+    margin-bottom: 4px;
+    transition: background var(--cw-transition);
+}
+
+.ct-success-screen__cta:hover {
+    background: #059669;
+}
+
+/* Underlined secondary link */
+.ct-success-screen__link {
+    display: inline-block;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--cw-text);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+    margin-top: 4px;
+}
+
+.ct-success-screen__link:hover {
+    color: var(--cw-text-secondary);
+}
+
+.ct-suggestions-list {
+    text-align: right;
+    margin-top: 28px;
+}
+
+.ct-suggestions-section {
+    margin-bottom: 28px;
+}
+
+.ct-suggestions-section__title {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--cw-text-muted);
+    text-transform: uppercase;
+    letter-spacing: .04em;
+    margin-bottom: 12px;
+}
+
+.ct-suggestion-item {
+    border: 1.5px solid #E5E7EB;
+    border-radius: var(--cw-radius-sm);
+    padding: 14px 16px;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    background: var(--cw-bg);
+}
+
+.ct-suggestion-item__content {
+    flex: 1;
+}
+
+.ct-suggestion-item__title {
+    font-size: 14px;
+    font-weight: 600;
+    display: block;
+    margin-bottom: 4px;
+}
+
+.ct-suggestion-item__desc {
+    font-size: 13px;
+    color: var(--cw-text-muted);
+    line-height: 1.4;
+}
+
+.ct-suggestion-item__action {
+    flex-shrink: 0;
+    background: none;
+    border: 1px solid var(--cw-green);
+    color: var(--cw-green);
+    padding: 6px 12px;
+    border-radius: var(--cw-radius-sm);
+    font-size: 13px;
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+/* ============================================================================
+   17. Info boxes
+   ============================================================================ */
+
+.ct-info-box {
+    background: #FFFBEB;
+    border: 1px solid #FDE68A;
+    border-radius: var(--cw-radius-sm);
+    padding: 12px 14px;
+    font-size: 13px;
+    color: #92400E;
+    margin: 12px 0;
+    line-height: 1.5;
+}
+
+.ct-info-box--green {
+    background: var(--cw-green-light);
+    border-color: var(--cw-green);
+    color: var(--cw-green);
+}
+
+/* ============================================================================
+   19. Loading state
+   ============================================================================ */
+
+.ct-wizard--loading {
+    pointer-events: none;
+}
+
+.ct-wizard--loading #ct-wizard-step-content {
+    opacity: 0.6;
+    transition: opacity 0.2s;
+}
+
+/* ============================================================================
+   20. Utilities
+   ============================================================================ */
+
+.ct-hidden {
+    display: none !important;
+}
+
+/* ============================================================================
+   21. Mobile responsive
+   ============================================================================ */
+
+@media (max-width: 640px) {
+    .ct-wizard-header__inner {
+        padding: 0 16px;
+    }
+
+    #ct-wizard-step-content {
+        padding: 20px 16px calc(var(--cw-footer-h) + 20px);
+    }
+
+    .ct-modal__box {
+        padding: 24px 20px;
+    }
+
+    .ct-days-grid {
+        gap: 6px;
+    }
+
+    .ct-day-toggle-btn {
+        width: 38px;
+        height: 38px;
+        font-size: 13px;
+    }
+}
+
+/* ============================================================================
+   Inline overlay variant
+   Used when the wizard is rendered inside an Elementor page (filter fallback)
+   rather than via the standalone wizard-shell.php (template_redirect path).
+   Covers the full viewport so the Elementor chrome is invisible to the user.
+   ============================================================================ */
+
+#ct-wizard-container.ct-wizard-inline {
+    position: fixed;
+    inset: 0;
+    z-index: 99999;
+    overflow-y: auto;
+    min-height: 100vh;
+    background: #ffffff;
+}
+
+/* Prevent the page body from scrolling behind the fixed overlay. */
+body:has(#ct-wizard-container.ct-wizard-inline) {
+    overflow: hidden;
+}
+
+/* ============================================================================
+   Landing step — "All Phases Overview" (Figma node 1272:803)
+   Two-column: phases list LEFT, title RIGHT (RTL)
+   ============================================================================ */
+
+.ct-wizard-landing {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 48px;
+    min-height: calc(100vh - var(--cw-header-h) - var(--cw-footer-h) - 64px);
+    padding: 32px 0;
+}
+
+/* Title column — RIGHT side in RTL (first in DOM = right) */
+.ct-wizard-landing__title-col {
+    flex: 0 0 44%;
+    text-align: right;
+}
+
+.ct-wizard-landing__title {
+    font-size: 40px;
+    font-weight: 600;
+    color: var(--cw-text);
+    line-height: 1.2;
+    letter-spacing: -1px;
+    margin: 0;
+}
+
+/* Phases list — LEFT side */
+.ct-wizard-landing__phases-col {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+/*
+ * Phase row: DOM order = [number][texts][icon]
+ * In RTL flex: number → RIGHT, texts → MIDDLE, icon → LEFT
+ * (matches Figma 1272:803 screenshot)
+ */
+.ct-wizard-landing__phase {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 28px 0;
+    border-bottom: 1px solid var(--cw-border-section);
+}
+
+.ct-wizard-landing__phase:first-child {
+    border-top: 1px solid var(--cw-border-section);
+}
+
+.ct-wizard-landing__phase-num {
+    font-size: 16px;
+    color: var(--cw-text);
+    flex-shrink: 0;
+    line-height: 1.75;
+    /* First in DOM → visual RIGHT in RTL flex */
+}
+
+.ct-wizard-landing__phase-texts {
+    text-align: right;
+    flex: 1; /* fills the middle space */
+}
+
+.ct-wizard-landing__phase-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--cw-text);
+    margin: 0 0 4px;
+    line-height: 1.5;
+}
+
+.ct-wizard-landing__phase-desc {
+    font-size: 15px;
+    color: var(--cw-text-muted);
+    margin: 0;
+    line-height: 1.6;
+}
+
+/* Phase icon square — 72×72px green rounded, last in DOM → LEFT in RTL flex */
+.ct-wizard-landing__phase-icon {
+    width: 72px;
+    height: 72px;
+    background: var(--cw-green-light);
+    border-radius: var(--cw-radius);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 28px;
+    flex-shrink: 0;
+}
+
+/* Mobile stacked layout */
+@media (max-width: 720px) {
+    .ct-wizard-landing {
+        flex-direction: column;
+        gap: 24px;
+        min-height: auto;
+    }
+    .ct-wizard-landing__title-col {
+        flex: none;
+        width: 100%;
+    }
+    .ct-wizard-landing__title {
+        font-size: 30px;
+    }
+}
+
+/* ============================================================================
+   Intro step image placeholder (fallback when no real photo exists)
+   ============================================================================ */
+
+.ct-intro-screen__image-placeholder {
+    width: 100%;
+    aspect-ratio: 3/2;
+    border-radius: var(--cw-radius-lg);
+    background: linear-gradient(135deg, #e2f5eb 0%, #c3e9d5 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 64px;
+}
+
+/* Mobile responsive fix */
+@media (max-width: 640px) {
+    .ct-wizard-footer__inner {
+        padding: 0 16px;
+    }
+    .ct-wizard-btn--next,
+    .ct-wizard-btn--back {
+        font-size: 15px;
+    }
+    .ct-step__title {
+        font-size: 22px;
+        letter-spacing: -0.5px;
+    }
+    .ct-checkbox-grid {
+        grid-template-columns: 1fr;
+    }
+    .ct-payment-layout {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* ============================================================================
+   Third-party floating button clearance (wizard shell only)
+   Scoped to body.ct-wizard-page so it never affects other pages.
+   ============================================================================ */
+body.ct-wizard-page .tr-button,
+body.ct-wizard-page #tr-button-mobile,
+body.ct-wizard-page .wpconsent-consent-floating-button,
+body.ct-wizard-page #wpconsent-consent-floating {
+    bottom: 105px !important;
+}

@@ -1,0 +1,409 @@
+/*
+ Theme Name:   My Listing Child
+ Theme URI:    http://mylisting.27collective.net/my-city/
+ Description:  MyListing Child Theme
+ Author:       27collective
+ Author URI:   https://27collective.net/
+ Template:     my-listing
+ Version:      1.1
+ License:      GNU General Public License v2 or later
+ License URI:  http://www.gnu.org/licenses/gpl-2.0.html
+ Tags:         one-column, two-columns, three-columns, left-sidebar, right-sidebar, grid-layout, custom-menu, custom-logo, featured-images, footer-widgets, full-width-template, sticky-post, theme-options, threaded-comments, translation-ready
+ Text Domain:  my-listing-child
+*/
+
+
+/** Reorder tags in map-explore page -- START */
+.hidden-tag {
+    display: none;
+    opacity: 0; 
+}
+
+.fade-transition {
+    transition: opacity 0.5s ease-in-out; 
+}
+
+.show-more-button {
+    cursor: pointer;
+    color: var(--accent);
+    display: list-item;
+    font-size: 17px !important;
+    clear: right;
+}
+/** Reorder tags in map-explore page ---- END */
+
+/** New leaflet (explorer and on the way maps) popup close button -- START */
+.leaflet-container a.leaflet-popup-close-button {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: auto !important;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: white !important;
+    border-radius: 50%; 
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
+    margin: 8px;
+    cursor: pointer;
+    border: none;
+    text-decoration: none;
+}
+
+.leaflet-container a.leaflet-popup-close-button::before,
+.leaflet-container a.leaflet-popup-close-button::after {
+    content: '';
+    position: absolute;
+    width: 12px;
+    height: 2px; 
+    background: #151515; 
+    border-radius: 1px; 
+}
+
+.leaflet-container a.leaflet-popup-close-button::before {
+    transform: rotate(45deg); 
+}
+
+
+.leaflet-container a.leaflet-popup-close-button::after {
+    transform: rotate(-45deg); 
+}
+/** New leaflet (explorer and on the way maps) popup close button -- END */
+
+/** Table of contents (תוכן עניינים) text color change -- START */
+.elementor-2498 .elementor-element.elementor-element-3aeacf8 a {
+    color: #3F3125;
+    text-decoration: none;
+}
+/** Table of contents (תוכן עניינים) text color change -- End */
+
+/** explore page open now filter bottom margin change -- START */
+.form-group.form-group-tags.explore-filter.open-now-filter{
+    margin-bottom: 20px !important;
+}
+/** explore page open now filter bottom margin change -- End */
+
+/** Tags in single listing page (cart page) made to be scrollable horizontally on mobile -- START */
+@media (max-width: 768px) {
+    ul.no-list-style.outlined-list.details-list.social-nav {
+        display: flex; 
+        flex-wrap: nowrap;
+        gap: 10px; 
+        max-width: 100%; 
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch; 
+        scrollbar-width: none; 
+    }
+
+    ul.no-list-style.outlined-list.details-list.social-nav::-webkit-scrollbar {
+        display: none; 
+    }
+
+    ul.no-list-style.outlined-list.details-list.social-nav li {
+        flex: 0 0 auto; 
+        display: inline-flex; 
+        width: auto !important; 
+        max-width: none; 
+        padding: 0; 
+        margin: 0; 
+    }
+
+    ul.no-list-style.outlined-list.details-list.social-nav li a {
+        display: inline-flex; 
+        align-items: center;
+        text-decoration: none; 
+        color: inherit; 
+        white-space: nowrap; 
+        margin-left: 2px;
+        font-size: 16px;
+    }
+
+}
+
+/** Tags in single listing page (cart page) made to be scrollable horizontally on mobile -- END */
+
+/*עמוד הצטרפות חדש*/
+.our-maslol{
+    box-shadow: 0px 4px 4px 0px #00000040;
+    border-radius: 21px;
+}
+
+.our-maslol h2{
+    background: #534741;
+    color: #fff;
+    width: 238px;
+    margin: auto;
+    box-shadow: 0px 4px 4px 0px #00000040;
+    border-radius: 10px;
+    height: 41px;
+    line-height: 41px;
+    max-width: 100%;
+}
+
+.our-maslol .elementor-button{
+    display: block;
+    height: 41px;
+    line-height: 41px;
+    padding: 0;
+}
+
+.our-maslol .elementor-widget-text-editor strong,
+.our-maslol .elementor-widget-text-editor b{
+    font-size: 80px;
+    font-weight: 400;
+    display: inline-block;
+    font-family: "Alata", Sans-serif!important;
+}
+
+.our-maslol .elementor-widget-text-editor em{
+        position: absolute;
+    top: -20px;
+    margin-inline-start: 15px;
+    font-style: normal;
+}
+
+.our-maslol .elementor-widget-text-editor span{
+    text-decoration: none!important;
+    display: block;
+}
+
+.our-maslol .elementor-widget-text-editor ul{
+    list-style-type: none;
+}
+
+.our-maslol.first .elementor-widget-text-editor ul li{
+    background: url(assets/images/include.svg) no-repeat right 2px;
+    font-size: 16px;
+    line-height: 26px;
+    padding-inline-start: 30px;
+}
+
+.our-maslol.first .elementor-widget-text-editor ul li:nth-child(-n+2){
+    background: url(assets/images/not-include.svg) no-repeat right 2px;
+}
+
+.our-maslol.second .elementor-widget-text-editor ul li{
+    background: url(assets/images/not-include.svg) no-repeat right 2px;
+    font-size: 16px;
+    line-height: 26px;
+    padding-inline-start: 30px;
+}
+
+.our-maslol.second .elementor-widget-text-editor ul li:nth-child(-n+2){
+    background: url(assets/images/include.svg) no-repeat right 2px;
+}
+
+body.page-id-20118 #c27-site-wrapper {
+    background-color: #fff;
+}
+
+body.page-id-20118 .text-bg p{
+    background: #209C62;
+    margin: 0;
+    box-shadow: 0px 4px 4px 0px #00000040;
+    border-radius: 10px;
+    display: inline-block;
+    width: 276px;
+    height: 47px;
+    line-height: normal;
+    padding-top: 2px;
+    text-align: center;
+}
+
+body.page-id-20118 .text-bg p a{
+    color:#fff
+}
+
+body.page-id-20118 .text-bg{
+    background: url(assets/images/arrow-down.svg) no-repeat center bottom;
+    padding-block-end: 30px;
+}
+
+body.page-id-20118 .text-bg.no-arrow{
+    background:none;
+    padding: 0;
+}
+
+body.page-id-20118 .text-bg p strong{
+    font-size: 20px;
+}
+
+body.page-id-20118 .text-bg.no-arrow p{
+    max-width: 100%;
+    width: 371px;
+    height: 77px;
+}
+
+body.page-id-20118 .text-bg.no-arrow p a{
+    display: block;
+    padding-block: 13px;
+    font-size: 20px;
+    background: url(assets/images/link-arrow.svg), url(assets/images/link-arrow.svg);
+    background-position: 23px 28px, 32px 28px;
+     background-repeat: no-repeat, no-repeat;
+}
+
+body.page-id-20118 .elementor-counter{
+        background: #FFF9F4;
+    box-shadow: 0px 4px 4px 0px #00000040;
+    padding-block: 21px;
+    border-radius: 10px;
+    padding-block-end: 11px;
+}
+
+.counter-block .e-con-inner{
+    gap:0
+}
+
+.counter-block .e-con-inner>.elementor-element{
+    padding-inline: 20px;
+}
+
+.how-works-block{
+    text-align: center;
+}
+
+.how-works-block .how-works-upper{
+    position: absolute;
+    right: 0;
+    top: -190px;
+}
+
+.how-works-block .how-works-bottom{
+    position: absolute;
+    left: 0;
+    bottom: -90px;
+}
+
+.how-works-block{
+    display: block!important;
+    background-repeat: no-repeat!important;
+    background-position: center!important;
+    background-size: 100% 100%!important;
+}
+
+.how-works-block .how-works-text .elementor-widget-container{
+    display: inline-block;
+    position: relative;
+}
+
+.how-works-block .how-works-text .elementor-widget-container strong{
+    font-size: 25px;
+}
+
+.how-works-block .how-works-text.first .elementor-widget-container:after{
+    content:"";
+    background: url(assets/images/how-works-1.png) no-repeat center bottom;
+    display: block;
+    position: absolute;
+    width: 131px;
+    height: 131px;
+    background-size: 131px;
+    top: -10px;
+    left: -65px;
+}
+
+.how-works-block .how-works-text.second .elementor-widget-container:after{
+    content:"";
+    background: url(assets/images/how-works-2.png) no-repeat center bottom;
+    display: block;
+    position: absolute;
+    width: 131px;
+    height: 131px;
+    background-size: 131px;
+    bottom: -90px;
+    right: -30px;
+}
+
+.how-works-block .how-works-text.third .elementor-widget-container:after{
+    content:"";
+    background: url(assets/images/how-works-3.png) no-repeat center bottom;
+    display: block;
+    position: absolute;
+    width: 131px;
+    height: 131px;
+    background-size: 131px;
+    top: 50px;
+    left: -54px;
+}
+
+.how-works-block .how-works-text.fours .elementor-widget-container:after{
+    content:"";
+    background: url(assets/images/how-works-4.png) no-repeat center bottom;
+    display: block;
+    position: absolute;
+    width: 131px;
+    height: 131px;
+    background-size: 131px;
+    bottom: -70px;
+    right: -60px;
+}
+
+.how-works-block .how-works-text .elementor-widget-container:after{
+    opacity: 0;
+    transform: translateY(-110%);
+    transition: transform 5s cubic-bezier(.22, 1, .36, 1), opacity 2s ease;
+    will-change: transform, opacity;
+}
+
+.how-works-block .how-works-text.is-visible .elementor-widget-container:after{
+     opacity: 1;
+    transform: translateY(0);   
+}
+
+body.page-id-20118 .elementor-widget-n-accordion .e-n-accordion-item[open]>.e-n-accordion-item-title,
+body.page-id-20118 .elementor-widget-n-accordion .e-n-accordion-item>.e-n-accordion-item-title{
+    border:none;
+    padding-block: 15px;
+}
+
+body.page-id-20118 .elementor-widget-n-accordion .e-n-accordion-item div[role="region"]{
+    border:none
+}
+
+body.page-id-20118 .elementor-widget-n-accordion .e-n-accordion-item{
+    border-bottom:1px solid #209C62;
+}
+
+body.page-id-20118 .elementor-widget-n-accordion .e-n-accordion-item-title{
+    justify-content: space-between;
+}
+
+@media (max-width: 766px) {
+    .our-maslol .elementor-widget-text-editor em{
+        margin-inline-start: 0;
+    }
+
+    .itronot br{
+        display:none;
+    }
+
+    .counter-block .e-con-inner>.elementor-element {
+        padding-inline: 10px;
+    }
+
+    .how-works-block .how-works-upper{
+        right: -80px;
+        top: -125px;
+    }
+
+    .how-works-block .how-works-bottom{
+        right: 0;
+    }
+
+    .how-works-block .how-works-text.first .elementor-widget-container:after{
+        width: 60px;
+        height: 110px;
+        background-size: 131px;
+        top: 16px;
+        left: -30px;
+    }
+
+    body.page-id-20118 .text-bg.no-arrow p a{
+        font-size: 15px;
+        background-position: 13px 19px, 23px 19px;
+        padding-block-start: 8px;
+    }
+}

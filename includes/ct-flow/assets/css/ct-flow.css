@@ -1,0 +1,573 @@
+/*
+ * ct-flow.css
+ *
+ * CoffeeTrail Flow — front-end + admin styles.
+ *
+ * Sections:
+ *  1. Utilities & Variables
+ *  2. Registration page
+ *  3. Terms step
+ *  4. Locked (PRO-only) field overlay
+ *  5. Done / thank-you page
+ *  6. Dashboard additions
+ *  7. Payment placeholder
+ *  8. Auto-save status bar
+ *  9. Admin moderation panel
+ */
+
+/* ============================================================================
+   1. Utilities & Variables
+   ============================================================================ */
+
+:root {
+	--ct-green:       #219156;
+	--ct-green-dark:  #1a7344;
+	--ct-pro-gold:    #e8a820;
+	--ct-pro-bg:      #fff8e8;
+	--ct-free-bg:     #f0faf5;
+	--ct-locked-bg:   rgba(0, 0, 0, 0.55);
+	--ct-border-r:    6px;
+	--ct-shadow:      0 2px 10px rgba(0,0,0,.10);
+}
+
+
+/* ============================================================================
+   2. Registration page
+   ============================================================================ */
+
+.ct-register-notice {
+	background: #fff8e8;
+	border-right: 4px solid var(--ct-pro-gold);
+	border-radius: var(--ct-border-r);
+	padding: 14px 18px;
+	margin-bottom: 20px;
+	font-size: 14px;
+	direction: rtl;
+	text-align: right;
+}
+
+.ct-register-notice__alert {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	font-weight: bold;
+	color: #555;
+}
+
+.ct-register-notice__alert .material-icons {
+	color: var(--ct-pro-gold);
+	font-size: 18px;
+}
+
+.ct-register-notice__plan {
+	margin-top: 8px;
+	font-size: 13px;
+	color: #666;
+}
+
+.ct-plan-switch-link {
+	color: var(--ct-green);
+	text-decoration: underline;
+}
+
+/* Plan badges */
+.ct-plan-badge {
+	display: inline-block;
+	padding: 2px 9px;
+	border-radius: 20px;
+	font-size: 12px;
+	font-weight: bold;
+	letter-spacing: .03em;
+}
+
+.ct-plan-badge--pro {
+	background: var(--ct-pro-gold);
+	color: #fff;
+}
+
+.ct-plan-badge--free {
+	background: var(--ct-green);
+	color: #fff;
+}
+
+/* Custom checkboxes on registration form */
+.ct-register-checkboxes {
+	direction: rtl;
+	text-align: right;
+	margin-bottom: 16px;
+}
+
+.ct-checkbox-group {
+	margin-bottom: 10px;
+}
+
+.ct-checkbox-label {
+	display: flex;
+	align-items: flex-start;
+	gap: 10px;
+	cursor: pointer;
+	font-size: 13px;
+	line-height: 1.55;
+	color: #444;
+}
+
+.ct-checkbox-label input[type="checkbox"] {
+	margin-top: 3px;
+	flex-shrink: 0;
+	width: 16px;
+	height: 16px;
+}
+
+.ct-checkbox-label--optional {
+	color: #666;
+}
+
+.ct-required-asterisk {
+	color: #e00;
+	font-weight: bold;
+}
+
+/* Register button */
+.ct-register-btn {
+	width: 100%;
+	justify-content: center;
+}
+
+/* Phone field — uses WooCommerce's native form-row structure; no custom styles needed */
+
+
+/* ============================================================================
+   3. Terms step
+   ============================================================================ */
+
+.ct-terms-section {
+	direction: rtl;
+	text-align: right;
+}
+
+.ct-terms-subtitle {
+	color: #666;
+	margin-top: 4px;
+}
+
+/* Scrollable terms box */
+.ct-terms-scroll-box {
+	border: 1px solid #e0e0e0;
+	border-radius: var(--ct-border-r);
+	padding: 20px 24px;
+	height: 320px;
+	overflow-y: auto;
+	background: #fafafa;
+	font-size: 14px;
+	line-height: 1.7;
+	color: #333;
+	scroll-behavior: smooth;
+}
+
+.ct-terms-scroll-box:focus {
+	outline: 2px solid var(--ct-green);
+}
+
+.ct-terms-scroll-box h3 {
+	font-size: 17px;
+	margin-top: 0;
+}
+
+.ct-terms-scroll-box h4 {
+	font-size: 15px;
+	margin-top: 20px;
+}
+
+/* Scroll hint */
+.ct-terms-scroll-hint {
+	text-align: center;
+	color: #888;
+	font-size: 13px;
+	margin-top: 6px;
+	padding: 4px 0 12px;
+	animation: ct-bounce 1.5s ease infinite;
+}
+
+@keyframes ct-bounce {
+	0%, 100% { transform: translateY(0); }
+	50%       { transform: translateY(4px); }
+}
+
+/* Terms checkboxes */
+.ct-terms-checkboxes {
+	margin-top: 18px;
+}
+
+/* Submit area */
+.ct-terms-submit-wrap {
+	margin-top: 24px;
+	text-align: center;
+}
+
+.ct-terms-submit-btn:disabled {
+	opacity: .45;
+	cursor: not-allowed;
+	pointer-events: none;
+}
+
+.ct-terms-submit-hint {
+	font-size: 12px;
+	color: #999;
+	margin-top: 8px;
+}
+
+/* Error notices */
+.ct-form-errors {
+	background: #fff0f0;
+	border-right: 4px solid #e00;
+	border-radius: var(--ct-border-r);
+	padding: 12px 16px;
+	margin-bottom: 20px;
+}
+
+.ct-error-message {
+	margin: 0;
+	color: #c00;
+	font-size: 14px;
+}
+
+
+/* ============================================================================
+   4. Locked (PRO-only) field overlay
+   ============================================================================ */
+
+/* Wrapper div gets this class when the field is locked */
+.ct-locked-field {
+	position: relative;
+}
+
+/* Prevent any interaction with the locked field */
+.ct-field-disabled {
+	pointer-events: none;
+	user-select: none;
+	opacity: .5;
+}
+
+/* Overlay covers the entire field row */
+.ct-locked-overlay {
+	position: absolute;
+	inset: 0;
+	z-index: 10;
+	background: var(--ct-locked-bg);
+	border-radius: var(--ct-border-r);
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+.ct-locked-overlay-inner {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 10px;
+	padding: 16px;
+	text-align: center;
+}
+
+.ct-pro-badge {
+	display: inline-flex;
+	align-items: center;
+	gap: 5px;
+	background: var(--ct-pro-gold);
+	color: #fff;
+	font-weight: bold;
+	font-size: 13px;
+	padding: 5px 12px;
+	border-radius: 20px;
+}
+
+.ct-pro-badge .material-icons {
+	font-size: 15px;
+}
+
+.ct-upgrade-btn {
+	font-size: 13px !important;
+	padding: 6px 16px !important;
+}
+
+
+/* ============================================================================
+   5. Done / thank-you page
+   ============================================================================ */
+
+.ct-done-notice {
+	direction: rtl;
+	text-align: right;
+}
+
+.ct-done-headline {
+	display: block;
+	font-size: 22px;
+	font-weight: bold;
+	color: var(--ct-green);
+	margin-bottom: 8px;
+}
+
+.ct-done-sub {
+	display: block;
+	font-size: 15px;
+	color: #555;
+	margin-bottom: 16px;
+}
+
+.ct-done-view-link {
+	color: var(--ct-green);
+	font-weight: bold;
+}
+
+.ct-done-actions {
+	margin-top: 24px;
+}
+
+
+/* ============================================================================
+   6. Dashboard additions
+   ============================================================================ */
+
+/* "Add New Listing" button row above the listing grid */
+.ct-dashboard-add-listing-row {
+	display: flex;
+	gap: 12px;
+	flex-wrap: wrap;
+	margin-bottom: 24px;
+	direction: rtl;
+}
+
+.ct-add-listing-btn {
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+}
+
+.ct-add-listing-btn--pro {
+	background: var(--ct-pro-gold) !important;
+	border-color: var(--ct-pro-gold) !important;
+	color: #fff !important;
+}
+
+/* Pending changes badge in listing action list */
+.ct-pending-changes-badge .ct-pending-badge {
+	display: inline-flex;
+	align-items: center;
+	gap: 4px;
+	background: #fff3cd;
+	border: 1px solid #ffc107;
+	border-radius: 20px;
+	padding: 3px 10px;
+	font-size: 12px;
+	color: #664d03;
+	white-space: nowrap;
+}
+
+.ct-pending-badge .material-icons {
+	font-size: 14px;
+	color: #ffc107;
+}
+
+
+/* ============================================================================
+   7. Payment placeholder
+   ============================================================================ */
+
+.ct-payment-section {
+	direction: rtl;
+	text-align: right;
+}
+
+.ct-payment-placeholder-box {
+	max-width: 560px;
+	margin: 0 auto;
+	text-align: center;
+	padding: 40px 32px;
+}
+
+.ct-payment-icon .material-icons {
+	font-size: 56px;
+	color: var(--ct-green);
+	opacity: .8;
+}
+
+.ct-payment-title {
+	font-size: 22px;
+	margin: 16px 0 12px;
+	color: #222;
+}
+
+.ct-payment-body {
+	font-size: 15px;
+	color: #555;
+	margin-bottom: 10px;
+	line-height: 1.65;
+}
+
+.ct-payment-placeholder-notice {
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+	background: #f0faf5;
+	border: 1px solid #b2dfcc;
+	border-radius: var(--ct-border-r);
+	padding: 10px 16px;
+	font-size: 13px;
+	color: #2d7a55;
+	margin: 20px 0;
+}
+
+.ct-payment-placeholder-notice .material-icons {
+	font-size: 16px;
+}
+
+
+/* ============================================================================
+   8. Auto-save status bar
+   ============================================================================ */
+
+.ct-autosave-status {
+	display: inline-block;
+	font-size: 12px;
+	color: #888;
+	padding: 4px 10px;
+	background: #f5f5f5;
+	border-radius: 4px;
+	margin-bottom: 8px;
+}
+
+
+/* ============================================================================
+   9. Admin moderation panel
+   ============================================================================ */
+
+.ct-admin-panel {
+	direction: rtl;
+	text-align: right;
+}
+
+.ct-admin-panel h1 {
+	margin-bottom: 16px;
+}
+
+/* Tab badge */
+.ct-tab-nav .ct-badge {
+	display: inline-block;
+	background: #c00;
+	color: #fff;
+	border-radius: 10px;
+	padding: 1px 7px;
+	font-size: 11px;
+	font-weight: bold;
+	margin-right: 5px;
+	vertical-align: middle;
+}
+
+.ct-tab-content {
+	padding: 20px 0;
+}
+
+.ct-empty-notice {
+	color: #666;
+	font-size: 15px;
+	padding: 20px 0;
+}
+
+/* Moderation table */
+.ct-mod-table th,
+.ct-mod-table td {
+	text-align: right;
+	vertical-align: middle;
+}
+
+/* Action buttons */
+.ct-btn-approve {
+	background: var(--ct-green) !important;
+	border-color: var(--ct-green-dark) !important;
+	color: #fff !important;
+}
+
+.ct-reject-form {
+	background: #fff5f5;
+	border: 1px solid #fcc;
+	border-radius: var(--ct-border-r);
+	padding: 12px;
+}
+
+/* Pending changes block */
+.ct-pending-listing-block {
+	border: 1px solid #e0e0e0;
+	border-radius: var(--ct-border-r);
+	padding: 20px;
+	margin-bottom: 24px;
+	background: #fff;
+	box-shadow: var(--ct-shadow);
+}
+
+.ct-pending-listing-block h3 {
+	margin-top: 0;
+	font-size: 16px;
+}
+
+.ct-author-meta {
+	font-size: 13px;
+	color: #666;
+	margin-bottom: 12px;
+}
+
+.ct-bulk-actions {
+	margin-bottom: 14px;
+}
+
+/* Diff table */
+.ct-diff-table {
+	margin-top: 10px;
+}
+
+.ct-diff-table td {
+	font-size: 13px;
+	vertical-align: top;
+}
+
+.ct-diff-old {
+	background: #fff0f0;
+}
+
+.ct-diff-new {
+	background: #f0fff4;
+}
+
+/* Plan badges in admin */
+.ct-admin-panel .ct-plan-badge {
+	font-size: 11px;
+	padding: 2px 8px;
+}
+
+/* Auth notice on add-listing page */
+.ct-auth-notice {
+	direction: rtl;
+	text-align: right;
+}
+
+.ct-auth-notice-inner {
+	padding: 4px 0;
+}
+
+.ct-auth-title {
+	margin-bottom: 8px;
+	font-size: 14px;
+}
+
+.ct-auth-plan-label {
+	margin-bottom: 10px;
+	font-size: 13px;
+}
+
+.ct-auth-cta {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	flex-wrap: wrap;
+	margin-bottom: 10px;
+}
