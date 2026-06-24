@@ -446,7 +446,7 @@ function ct_auth_field_class( $field, $errors ) {
 
 		<?php if ( $otp_stage ) : ?>
 		<div class="ct-auth-variant ct-auth-variant--active" id="ct-auth-otp" aria-hidden="false">
-			<h2 class="ct-auth-title">אימות כתובת האימייל 2</h2>
+			<h2 class="ct-auth-title">אימות כתובת האימייל</h2>
 			<p class="ct-auth-subtitle">
 				שלחנו קוד בן 6 ספרות אל
 				<strong dir="ltr"><?php echo esc_html( $otp_email ); ?></strong>
