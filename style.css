@@ -407,3 +407,8 @@ body.page-id-20118 .elementor-widget-n-accordion .e-n-accordion-item-title{
         padding-block-start: 8px;
     }
 }
+
+.leaflet-pane>svg path.leaflet-interactive{
+    fill: #219156;
+    stroke: #219156;
+}
