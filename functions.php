@@ -800,3 +800,31 @@ add_filter(
 		return $filters;
 	}
 );
+
+/**
+ * Draw a results radius on regional Explore searches by Eran.
+ */
+add_action(
+    'wp_enqueue_scripts',
+    static function (): void {
+        if (!is_page('map-explore')) {
+            return;
+        }
+
+        $relative_path = '/assets/js/ct-region-results-radius.js';
+        $file_path     = get_stylesheet_directory() . $relative_path;
+
+        if (!file_exists($file_path)) {
+            return;
+        }
+
+        wp_enqueue_script(
+            'ct-region-results-radius',
+            get_stylesheet_directory_uri() . $relative_path,
+            ['jquery'],
+            (string) filemtime($file_path),
+            true
+        );
+    },
+    600
+);
