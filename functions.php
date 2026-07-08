@@ -828,3 +828,56 @@ add_action(
     },
     600
 );
+
+/**
+ * Add default WordPress post tags to MyListing listings CPT.
+ */
+add_action('init', function () {
+    register_taxonomy_for_object_type('post_tag', 'job_listing');
+}, 20);
+
+
+/**
+ * Enable Yoast Schema only on MyListing single listings.
+ */
+add_filter('wpseo_json_ld_output', function ($output) {
+    if (is_singular('job_listing')) {
+        return true;
+    }
+
+    return $output;
+}, 999);
+
+
+/**
+ * Add post tags as keywords to Yoast WebPage schema.
+ */
+add_filter('wpseo_schema_graph', function ($graph, $context) {
+    if (!is_singular('job_listing')) {
+        return $graph;
+    }
+
+    $tags = get_the_terms(get_the_ID(), 'post_tag');
+
+    if (empty($tags) || is_wp_error($tags)) {
+        return $graph;
+    }
+
+    $keywords = implode(', ', wp_list_pluck($tags, 'name'));
+
+    foreach ($graph as &$piece) {
+        if (
+            isset($piece['@type']) &&
+            (
+                $piece['@type'] === 'WebPage' ||
+                (is_array($piece['@type']) && in_array('WebPage', $piece['@type'], true))
+            )
+        ) {
+            $piece['keywords'] = $keywords;
+        }
+    }
+
+    unset($piece);
+
+    return $graph;
+}, 99, 2);
