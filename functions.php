@@ -5,6 +5,7 @@ require_once get_stylesheet_directory() . '/includes/explore_terms_priority.php'
 require_once get_stylesheet_directory() . '/includes/similar_carts_single_listing.php';
 require_once get_stylesheet_directory() . '/includes/single_listing_terms_priority.php';
 require_once get_stylesheet_directory() . '/includes/ct-flow/ct-flow.php';
+require_once get_stylesheet_directory() . '/includes/my-account/functions.php';
 
 add_action('wp_footer', function() {
     if (!is_page(absint(c27()->get_setting('general_add_listing_page')))) {

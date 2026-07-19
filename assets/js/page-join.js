@@ -290,18 +290,41 @@ if (revealSections.length) {
 const steps = document.querySelector('.ct-join__steps');
 
 if (steps) {
-    const observer = new IntersectionObserver((entries, obs) => {
-        entries.forEach((entry) => {
-            if (!entry.isIntersecting) {
-                return;
-            }
+    const stepItems = Array.from(
+        steps.querySelectorAll('.ct-join__step')
+    );
 
-            steps.classList.add('is-active');
-            obs.unobserve(steps);
+    const lineDuration = 1200;
+
+    const activateSteps = () => {
+        steps.classList.add('is-active');
+
+        stepItems.forEach((step, index) => {
+            const delay = stepItems.length > 1
+                ? (lineDuration / (stepItems.length - 1)) * index
+                : 0;
+
+            window.setTimeout(() => {
+                step.classList.add('is-active');
+            }, delay);
         });
-    }, {
-        threshold: 0.4
-    });
+    };
+
+    const observer = new IntersectionObserver(
+        (entries, instance) => {
+            entries.forEach((entry) => {
+                if (!entry.isIntersecting) {
+                    return;
+                }
+
+                activateSteps();
+                instance.unobserve(entry.target);
+            });
+        },
+        {
+            threshold: 0.4,
+        }
+    );
 
     observer.observe(steps);
 }
