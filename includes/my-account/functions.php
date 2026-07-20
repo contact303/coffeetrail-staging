@@ -364,6 +364,7 @@ function account_menu_per_listing_plan() {
     }
 
     $plan_data = ct_get_user_listing_plan();
+    $listing_id = (int) $plan_data['listing_id'];
     $is_pro    = $plan_data['is_pro'];
     $plan_slug = $plan_data['plan_slug'];
 
@@ -389,10 +390,13 @@ function account_menu_per_listing_plan() {
 
     $current_endpoint_value = get_query_var( $plan_slug );
     $current_page           = ct_get_nested_account_page( $current_endpoint_value );
+
+    $coffeecart_owner = get_post_meta( $listing_id, '_coffeecart-owner', true )[0];    
+    
     ?>
 
     <nav class="woocommerce-MyAccount-navigation ct-account-navigation">
-        <ul>
+        <ul class="ct-account-navigation__menu">
             <?php foreach ( $menu_items as $page_slug => $label ) : ?>
                 <?php
                 $classes = [
@@ -412,7 +416,109 @@ function account_menu_per_listing_plan() {
                 </li>
             <?php endforeach; ?>
         </ul>
-    </nav>
 
+        <div class="ct-account-navigation__tools">
+            <div class="ct-account-help">
+                <button
+                    type="button"
+                    class="ct-account-help__toggle"
+                    aria-expanded="false"
+                    aria-controls="ct-account-help-panel"
+                >
+                    <span class="ct-account-help__toggle-text">עזרה</span>
+
+                    <span class="ct-account-help__toggle-icon" aria-hidden="true">
+                        ?
+                    </span>
+                </button>
+
+                <div
+                    id="ct-account-help-panel"
+                    class="ct-account-help__panel"
+                    hidden
+                >
+                    <p class="ct-account-help__title">
+                        צריכים עזרה?
+                    </p>
+
+                    <p class="ct-account-help__description">
+                        הצוות שלנו זמין לכל שאלה — נשמח לעזור.
+                    </p>
+
+                    <a
+                        href="mailto:help@coffeetrail.co.il"
+                        class="ct-account-help__contact"
+                    >
+                        <span class="ct-account-help__contact-icon" aria-hidden="true">
+                            <svg
+                                width="18"
+                                height="18"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="1.7"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                            >
+                                <rect x="3" y="5" width="18" height="14" rx="2"></rect>
+                                <path d="M3 7l9 6 9-6"></path>
+                            </svg>
+                        </span>
+
+                        <span class="ct-account-help__contact-content">
+                            <span class="ct-account-help__contact-label">
+                                אימייל
+                            </span>
+
+                            <span class="ct-account-help__contact-value">
+                                help@coffeetrail.co.il
+                            </span>
+                        </span>
+                    </a>
+
+                    <a
+                        href="https://wa.me/972500000000"
+                        class="ct-account-help__contact"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                    >
+                        <span class="ct-account-help__contact-icon" aria-hidden="true">
+                            <svg
+                                width="18"
+                                height="18"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="1.7"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                            >
+                                <path d="M21 11.5a8.5 8.5 0 0 1-12.3 7.6L3 21l1.9-5.7A8.5 8.5 0 1 1 21 11.5z"></path>
+                                <path d="M8.5 9c0 4 2.5 6.5 6.5 6.5l1-2-2.2-1-1 1c-1.1-.5-2.3-1.7-2.8-2.8l1-1-1-2.2z"></path>
+                            </svg>
+                        </span>
+
+                        <span class="ct-account-help__contact-content">
+                            <span class="ct-account-help__contact-label">
+                                וואטסאפ
+                            </span>
+
+                            <span class="ct-account-help__contact-value">
+                                050-000-0000
+                            </span>
+                        </span>
+                    </a>
+                </div>
+
+            </div>
+
+            <?php if ( ! empty( $coffeecart_owner ) ) : ?>
+                <div class="ct-account-owner-image">
+                     <img src="<?php echo esc_url( $coffeecart_owner ); ?>" alt="<?php echo esc_html( get_the_title( $listing_id ) ); ?>">
+                </div>
+            <?php endif; ?>
+
+        </div>
+    </nav>
     <?php
 }
