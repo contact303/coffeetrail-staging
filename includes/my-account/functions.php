@@ -47,13 +47,19 @@ add_action( 'wp_enqueue_scripts', function () {
 
 
 /**
- * החלפת תפריט WooCommerce המקורי בתפריט מותאם לפי החבילה.
+ * החלפת תפריט WooCommerce המקורי בתפריט המותאם.
  */
 add_action( 'wp_loaded', function () {
 
     remove_action(
         'woocommerce_account_navigation',
         'woocommerce_account_navigation',
+        10
+    );
+
+    remove_action(
+        'woocommerce_account_navigation',
+        'account_menu_per_listing_plan',
         10
     );
 
@@ -107,29 +113,54 @@ function ct_get_user_listing_plan( $user_id = 0 ) {
         'post_type'      => 'job_listing',
         'author'         => $user_id,
         'post_status'    => [ 'publish', 'pending', 'draft' ],
-        'posts_per_page' => 1,
+        'posts_per_page' => -1,
         'fields'         => 'ids',
+        'orderby'        => 'date',
+        'order'          => 'DESC',
         'no_found_rows'  => true,
     ] );
 
-    $listing_id = ! empty( $listing_query->posts )
-        ? (int) $listing_query->posts[0]
+    $listing_ids = array_map( 'intval', $listing_query->posts );
+
+    $requested_listing_id = isset( $_GET['listing_id'] )
+        ? absint( $_GET['listing_id'] )
         : 0;
 
-    $plan_value = $listing_id
-        ? (string) get_post_meta( $listing_id, '_ct_registered_plan', true )
-        : '';
+    /*
+     * מוודאים שהעגלה שנבחרה באמת שייכת למשתמש.
+     */
+    if (
+        $requested_listing_id
+        && in_array( $requested_listing_id, $listing_ids, true )
+    ) {
+        $listing_id = $requested_listing_id;
+    } else {
+        $listing_id = ! empty( $listing_ids )
+            ? $listing_ids[0]
+            : 0;
+    }
 
-    $is_pro = (
-        $plan_value !== ''
-        && strtolower( trim( $plan_value ) ) !== 'free'
-    );
+    $package_id = $listing_id
+        ? absint( get_post_meta( $listing_id, '_package_id', true ) )
+        : 0;
+
+    /**
+     * מזהי חבילות PRO.
+     * ניתן להוסיף כאן חבילות נוספות בעתיד.
+     */
+    $pro_package_ids = [ 25 ];
+
+    $is_pro = in_array( $package_id, $pro_package_ids, true );
 
     return [
-        'listing_id' => $listing_id,
-        'plan_value' => $plan_value,
-        'is_pro'     => $is_pro,
-        'plan_slug'  => $is_pro ? 'pro' : 'free',
+        'listing_id'     => $listing_id,
+        'listing_ids'    => $listing_ids,
+        'package_id'     => $package_id,
+        'user_package_id' => $listing_id
+            ? absint( get_post_meta( $listing_id, '_user_package_id', true ) )
+            : 0,
+        'is_pro'         => $is_pro,
+        'plan_slug'      => $is_pro ? 'pro' : 'free',
     ];
 }
 
@@ -144,12 +175,14 @@ function ct_get_user_listing_plan( $user_id = 0 ) {
  */
 function ct_get_account_plan_pages( $plan_slug ) {
 
+
     if ( 'pro' === $plan_slug ) {
         return [
             'home',
-            'my-listings',
-            'analytics',
-            'edit-account',
+            'my-page',
+            'page-actions',
+            'exposure-opportunities',
+            'account-settings',
         ];
     }
 
@@ -220,19 +253,34 @@ function ct_load_dashboard_template( $plan_slug, $template_name, $args = [] ) {
  * @param string $default_page   עמוד ברירת מחדל.
  * @return string
  */
-function ct_get_nested_account_page( $endpoint_value, $default_page = 'home' ) {
+function ct_get_nested_account_page( $plan_slug, $default_page = 'home' ) {
 
-    $endpoint_value = is_string( $endpoint_value )
-        ? trim( $endpoint_value, '/' )
-        : '';
+    $endpoint_value = get_query_var( $plan_slug );
 
-    if ( '' === $endpoint_value ) {
-        return $default_page;
+    if ( is_string( $endpoint_value ) && $endpoint_value !== '' ) {
+        $parts = explode( '/', trim( $endpoint_value, '/' ) );
+
+        if ( ! empty( $parts[0] ) ) {
+            return sanitize_key( $parts[0] );
+        }
     }
 
-    $parts = explode( '/', $endpoint_value );
+    /*
+     * Fallback במקרה ש-WooCommerce לא מחזיר את הנתיב הפנימי.
+     */
+    $request_path = isset( $_SERVER['REQUEST_URI'] )
+        ? wp_parse_url( wp_unslash( $_SERVER['REQUEST_URI'] ), PHP_URL_PATH )
+        : '';
 
-    return sanitize_key( $parts[0] );
+    if ( $request_path ) {
+        $pattern = '#/my-account/' . preg_quote( $plan_slug, '#' ) . '/([^/?]+)/?#';
+
+        if ( preg_match( $pattern, $request_path, $matches ) ) {
+            return sanitize_key( $matches[1] );
+        }
+    }
+
+    return $default_page;
 }
 
 
@@ -244,11 +292,17 @@ add_action( 'woocommerce_account_free_endpoint', function ( $endpoint_value ) {
     $plan_data = ct_get_user_listing_plan();
 
     if ( $plan_data['is_pro'] ) {
-        wp_safe_redirect( ct_get_account_plan_url( 'pro', 'home' ) );
+        wp_safe_redirect(
+            ct_get_account_plan_url(
+                'pro',
+                'home',
+                $plan_data['listing_id']
+            )
+        );
         exit;
     }
 
-    $page          = ct_get_nested_account_page( $endpoint_value );
+    $page          = ct_get_nested_account_page( 'free' );
     $allowed_pages = ct_get_account_plan_pages( 'free' );
 
     if ( ! in_array( $page, $allowed_pages, true ) ) {
@@ -265,8 +319,10 @@ add_action( 'woocommerce_account_free_endpoint', function ( $endpoint_value ) {
         'current_user' => $current_user,
         'listing_id'   => $plan_data['listing_id'],
         'listing'      => $listing,
-        'plan_value'   => $plan_data['plan_value'],
-        'is_pro'       => false,
+        'listing_ids'    => $plan_data['listing_ids'],
+        'package_id'     => $plan_data['package_id'],
+        'user_package_id'=> $plan_data['user_package_id'],
+        'is_pro'         => false,
     ] );
 
 } );
@@ -280,11 +336,17 @@ add_action( 'woocommerce_account_pro_endpoint', function ( $endpoint_value ) {
     $plan_data = ct_get_user_listing_plan();
 
     if ( ! $plan_data['is_pro'] ) {
-        wp_safe_redirect( ct_get_account_plan_url( 'free', 'home' ) );
+        wp_safe_redirect(
+            ct_get_account_plan_url(
+                'free',
+                'home',
+                $plan_data['listing_id']
+            )
+        );
         exit;
     }
 
-    $page          = ct_get_nested_account_page( $endpoint_value );
+    $page = ct_get_nested_account_page( 'pro' );
     $allowed_pages = ct_get_account_plan_pages( 'pro' );
 
     if ( ! in_array( $page, $allowed_pages, true ) ) {
@@ -301,8 +363,10 @@ add_action( 'woocommerce_account_pro_endpoint', function ( $endpoint_value ) {
         'current_user' => $current_user,
         'listing_id'   => $plan_data['listing_id'],
         'listing'      => $listing,
-        'plan_value'   => $plan_data['plan_value'],
-        'is_pro'       => true,
+        'listing_ids'    => $plan_data['listing_ids'],
+        'package_id'     => $plan_data['package_id'],
+        'user_package_id'=> $plan_data['user_package_id'],
+        'is_pro'         => true,
     ] );
 
 } );
@@ -315,11 +379,24 @@ add_action( 'woocommerce_account_pro_endpoint', function ( $endpoint_value ) {
  * @param string $page_slug שם העמוד.
  * @return string
  */
-function ct_get_account_plan_url( $plan_slug, $page_slug = 'home' ) {
+function ct_get_account_plan_url( $plan_slug, $page_slug = 'home', $listing_id = 0 ) {
 
-    $base_url = wc_get_account_endpoint_url( sanitize_key( $plan_slug ) );
+    $base_url = wc_get_account_endpoint_url(
+        sanitize_key( $plan_slug )
+    );
 
-    return trailingslashit( $base_url ) . trailingslashit( sanitize_key( $page_slug ) );
+    $url = trailingslashit( $base_url )
+        . trailingslashit( sanitize_key( $page_slug ) );
+
+    if ( $listing_id ) {
+        $url = add_query_arg(
+            'listing_id',
+            absint( $listing_id ),
+            $url
+        );
+    }
+
+    return $url;
 }
 
 
@@ -347,7 +424,11 @@ add_action( 'template_redirect', function () {
     $plan_data = ct_get_user_listing_plan();
 
     wp_safe_redirect(
-        ct_get_account_plan_url( $plan_data['plan_slug'], 'home' )
+        ct_get_account_plan_url(
+            $plan_data['plan_slug'],
+            'home',
+            $plan_data['listing_id']
+        )
     );
     exit;
 
@@ -371,10 +452,11 @@ function account_menu_per_listing_plan() {
     if ( $is_pro ) {
 
         $menu_items = [
-            'home'         => 'ראשי',
-            'my-listings'  => 'עגלת הקפה שלי',
-            'analytics'    => 'נתונים וסטטיסטיקות',
-            'edit-account' => 'פרטי חשבון',
+            'home'                   => 'בית',
+            'my-page'                => 'העמוד שלי',
+            'page-actions'           => 'פעולות בעמוד',
+            'exposure-opportunities' => 'הזדמנויות חשיפה',
+            'account-settings'       => 'הגדרות',
         ];
 
     } else {
@@ -389,9 +471,28 @@ function account_menu_per_listing_plan() {
     }
 
     $current_endpoint_value = get_query_var( $plan_slug );
-    $current_page           = ct_get_nested_account_page( $current_endpoint_value );
+    $current_page           = ct_get_nested_account_page( $plan_slug );
 
-    $coffeecart_owner = get_post_meta( $listing_id, '_coffeecart-owner', true )[0];    
+    $owner_meta = get_post_meta(
+        $listing_id,
+        '_coffeecart-owner',
+        true
+    );
+
+    $coffeecart_owner = is_array( $owner_meta )
+        ? ( $owner_meta[0] ?? '' )
+        : $owner_meta;
+
+    $owner_image_url = '';
+
+    if ( is_numeric( $coffeecart_owner ) ) {
+        $owner_image_url = wp_get_attachment_image_url(
+            absint( $coffeecart_owner ),
+            'thumbnail'
+        );
+    } elseif ( is_string( $coffeecart_owner ) ) {
+        $owner_image_url = $coffeecart_owner;
+    }
     
     ?>
 
@@ -410,7 +511,7 @@ function account_menu_per_listing_plan() {
                 ?>
 
                 <li class="<?php echo esc_attr( implode( ' ', $classes ) ); ?>">
-                    <a href="<?php echo esc_url( ct_get_account_plan_url( $plan_slug, $page_slug ) ); ?>">
+                    <a href="<?php echo esc_url( ct_get_account_plan_url( $plan_slug, $page_slug, $listing_id ) ); ?>">
                         <?php echo esc_html( $label ); ?>
                     </a>
                 </li>
@@ -512,9 +613,13 @@ function account_menu_per_listing_plan() {
 
             </div>
 
-            <?php if ( ! empty( $coffeecart_owner ) ) : ?>
+            <?php if ( $owner_image_url ) : ?>
                 <div class="ct-account-owner-image">
-                     <img src="<?php echo esc_url( $coffeecart_owner ); ?>" alt="<?php echo esc_html( get_the_title( $listing_id ) ); ?>">
+                    <img
+                        src="<?php echo esc_url( $owner_image_url ); ?>"
+                        class="ct-account-owner-image__img"
+                        alt="<?php echo esc_attr( get_the_title( $listing_id ) ); ?>"
+                    >
                 </div>
             <?php endif; ?>
 

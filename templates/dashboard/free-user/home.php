@@ -1,6 +1,26 @@
 <?php
 defined( 'ABSPATH' ) || exit;
-$coffeecart_owner = get_post_meta( $listing_id, '_coffeecart-owner', true )[0];
+
+$owner_meta = get_post_meta(
+    $listing_id,
+    '_coffeecart-owner',
+    true
+);
+
+$coffeecart_owner = is_array( $owner_meta )
+    ? ( $owner_meta[0] ?? '' )
+    : $owner_meta;
+
+$owner_image_url = '';
+
+if ( is_numeric( $coffeecart_owner ) ) {
+    $owner_image_url = wp_get_attachment_image_url(
+        absint( $coffeecart_owner ),
+        'thumbnail'
+    );
+} elseif ( is_string( $coffeecart_owner ) ) {
+    $owner_image_url = $coffeecart_owner;
+}
 ?>
 
 <section class="ct-account-page">
@@ -42,8 +62,13 @@ $coffeecart_owner = get_post_meta( $listing_id, '_coffeecart-owner', true )[0];
     <section class="ct-account-preview">
         <div class="ct-account-preview__image">
             <span class="ct-account-preview__image-placeholder">
-                <?php if ( ! empty( $coffeecart_owner ) ) : ?>
-                    <img src="<?php echo esc_url( $coffeecart_owner ); ?>" alt="<?php echo esc_html( get_the_title( $listing_id ) ); ?>">
+                <?php if ( $owner_image_url ) : ?>
+
+                    <img
+                        src="<?php echo esc_url( $owner_image_url ); ?>"
+                        class="ct-account-owner-image__img"
+                        alt="<?php echo esc_attr( get_the_title( $listing_id ) ); ?>"
+                    >
                 <?php else : ?>
                 <svg
                     width="22"

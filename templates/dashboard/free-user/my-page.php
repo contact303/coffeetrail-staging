@@ -2,6 +2,23 @@
 defined( 'ABSPATH' ) || exit;
 $location_coffee = get_post_meta( $listing_id, '_location_coffee', true );
 $job_phone = get_post_meta( $listing_id, '_job_phone', true );
+$current_user_id = get_current_user_id();
+
+$listings_query = new WP_Query( [
+    'post_type'      => 'job_listing',
+    'author'         => $current_user_id,
+    'post_status'    => [ 'publish', 'pending', 'draft' ],
+    'posts_per_page' => -1,
+    'fields'         => 'ids',
+    'orderby'        => 'date',
+    'order'          => 'DESC',
+    'no_found_rows'  => true,
+] );
+
+$listing_ids    = array_map( 'intval', $listings_query->posts );
+$listings_count = count( $listing_ids );
+$has_multiple   = $listings_count > 1;
+
 ?>
 
 <section class="ct-account-page my-page">
@@ -11,9 +28,49 @@ $job_phone = get_post_meta( $listing_id, '_job_phone', true );
               <div>
                 <div class="ct-public-preview__title-row">
                   <h1 class="ct-public-preview__title"><span class="sc-interp"><?php echo esc_html( get_the_title( $listing_id ) ); ?></span></h1>
+                  <?php if ( $has_multiple ) : ?>
                   <span class="ct-public-preview__title-toggle">
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
-                  </span>
+                  </span>                    
+
+                        <div class="ct-user-listings" hidden>
+
+                            <?php foreach ( $listing_ids as $user_listing_id ) : ?>
+                                <?php
+
+                                  $listing_package_id = absint(
+                                      get_post_meta(
+                                          $user_listing_id,
+                                          '_package_id',
+                                          true
+                                      )
+                                  );
+
+                                  $listing_plan_slug = in_array(
+                                      $listing_package_id,
+                                      [ 24 ],
+                                      true
+                                  ) ? 'pro' : 'free';
+
+                                  $listing_manage_url = ct_get_account_plan_url(
+                                      $listing_plan_slug,
+                                      'home',
+                                      $user_listing_id
+                                  );
+                                ?>
+                                <div
+                                    class="ct-user-listings__item <?php echo $user_listing_id === (int) $listing_id ? 'is-current' : ''; ?>"
+                                >
+                                  <a href="<?php echo esc_url( $listing_manage_url ); ?>">
+                                      <?php echo esc_html( get_the_title( $user_listing_id ) ); ?>
+                                  </a>
+                                </div>
+
+                            <?php endforeach; ?>
+
+                        </div>
+
+                    <?php endif; ?>
                 </div>
                 <p class="ct-public-preview__subtitle">כך העמוד שלכם נראה בקופיטרייל.</p>
               </div>
@@ -58,7 +115,7 @@ $job_phone = get_post_meta( $listing_id, '_job_phone', true );
               <div class="ct-preview-card ct-preview-about">
                 <div class="ct-preview-card__header">
                   <h2 class="ct-preview-card__title">על העגלה</h2>
-                  <button class="ct-preview-card__edit-button">עריכת פרטי העמוד</button>
+                  <a href="/add-listing/" class="ct-preview-card__edit-button">עריכת פרטי העמוד</a>
                 </div>
                 <div class="ct-preview-about__details">
                   <?php if ( ! empty( $location_coffee ) ) : ?>

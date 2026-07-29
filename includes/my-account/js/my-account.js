@@ -104,3 +104,54 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 });
+
+// Handle the listings panel toggle
+document.addEventListener('DOMContentLoaded', () => {
+    const help = document.querySelector('.ct-public-preview__title-row');
+
+    if (!help) {
+        return;
+    }
+
+    const toggle = help.querySelector('.ct-public-preview__title-toggle');
+    const panel = help.querySelector('.ct-user-listings');
+
+    if (!toggle || !panel) {
+        return;
+    }
+
+    const openPanel = () => {
+        panel.removeAttribute('hidden');
+        toggle.setAttribute('aria-expanded', 'true');
+    };
+
+    const closePanel = () => {
+        panel.setAttribute('hidden', '');
+        toggle.setAttribute('aria-expanded', 'false');
+    };
+
+    toggle.addEventListener('click', (event) => {
+        event.stopPropagation();
+
+        const isOpen = toggle.getAttribute('aria-expanded') === 'true';
+
+        if (isOpen) {
+            closePanel();
+        } else {
+            openPanel();
+        }
+    });
+
+    panel.addEventListener('click', (event) => {
+        event.stopPropagation();
+    });
+
+    document.addEventListener('click', closePanel);
+
+    document.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape') {
+            closePanel();
+            toggle.focus();
+        }
+    });
+});
