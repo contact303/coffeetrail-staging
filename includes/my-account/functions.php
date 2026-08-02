@@ -612,17 +612,31 @@ function account_menu_per_listing_plan() {
                 </div>
 
             </div>
-
-            <?php if ( $owner_image_url ) : ?>
-                <div class="ct-account-owner-image">
+            
+            <div class="ct-account-owner-image">
+                <?php if ( $owner_image_url ) : ?>
                     <img
                         src="<?php echo esc_url( $owner_image_url ); ?>"
                         class="ct-account-owner-image__img"
                         alt="<?php echo esc_attr( get_the_title( $listing_id ) ); ?>"
                     >
-                </div>
-            <?php endif; ?>
+                    <?php else : ?>
+                        <?php
+                        $logo_url = wp_get_attachment_image_url(
+                            get_theme_mod('custom_logo'),
+                            'full'
+                        );
 
+                        if ( $logo_url ) :
+                        ?>
+                        <img
+                            src="<?php echo esc_url( $logo_url ); ?>"
+                            class="ct-account-owner-image__img"
+                            alt="<?php echo esc_attr( get_the_title( $listing_id ) ); ?>"
+                        >
+                    <?php endif; ?>                
+                <?php endif; ?>
+                </div>            
         </div>
     </nav>
     <?php

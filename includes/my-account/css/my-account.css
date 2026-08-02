@@ -150,21 +150,22 @@ body.woocommerce-account .mlduo-account-menu{
     position: relative;
     flex-shrink: 0;
     width: 132px;
-    height: 96px;
+    height: auto;
     overflow: hidden;
     border: 1px solid #e4dccd;
     border-radius: 12px;
-    background-image: repeating-linear-gradient(
+    padding: 15px;
+    /*background-image: repeating-linear-gradient(
         45deg,
         #ede6d9 0,
         #ede6d9 10px,
         #e5dccb 10px,
         #e5dccb 20px
-    );
+    );*/
 }
 
 .ct-account-preview__image-placeholder {
-    position: absolute;
+    /*position: absolute;*/
     inset: 0;
     display: flex;
     align-items: center;
@@ -2126,6 +2127,120 @@ body.woocommerce-account .mlduo-account-menu{
   font-size: 16px;
   font-weight: 700;
 }
+
+.ct-dashboard-welcome .share-block{
+    margin-top: 6px;
+    border-top: 1px solid rgb(205, 230, 214);
+    padding-top: 24px;
+    display: none;
+}
+
+.ct-dashboard-welcome.is-active .share-block{
+    display: block;
+}
+
+.ct-dashboard-welcome .share-block h2{
+    margin: 0px 0px 14px;
+    font-size: 15px;
+    font-weight: 800;
+    color: rgb(33, 29, 26);
+}
+
+.ct-dashboard-welcome .share-buttons{
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.ct-dashboard-welcome .share-buttons button.share-button{
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 15px;
+    background: rgb(255, 255, 255);
+    border: 1px solid rgb(231, 224, 210);
+    border-radius: 12px;
+    padding: 12px 16px;
+    cursor: pointer;
+    font-family: inherit;
+    text-align: right;
+}
+
+.ct-dashboard-welcome .share-buttons button.share-button span.arrow{
+    margin-right: auto;
+}
+
+.ct-dashboard-welcome .share-buttons button.share-button>span.icon{
+    display: flex;
+    align-items: center;
+    gap: 13px;
+}
+
+.ct-dashboard-welcome .share-buttons button.share-button span.icon{
+    width: 38px;
+    height: 38px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.ct-dashboard-welcome .share-buttons button.share-button.whatsapp span.icon {
+    background: rgb(37, 211, 102);
+}
+
+.ct-dashboard-welcome .share-buttons button.share-button.facebook span.icon {
+    background: rgb(24, 119, 242);
+}
+
+.ct-dashboard-welcome .share-buttons button.share-button.copy-link span.icon {
+    background: rgb(33, 29, 26);
+}
+
+.ct-dashboard-welcome .share-buttons button.share-button.qr-code span.icon {
+    background: rgb(94, 87, 75);
+}
+
+.ct-dashboard-welcome .share-buttons button.share-button.qr-code.copy-link span.arrow{
+    color: rgb(168, 159, 144);
+    font-size: 18px;
+}
+
+
+.ct-dashboard-welcome .share-buttons button.share-button span.text{
+    font-size: 16px;
+    font-weight: 700;
+    color: rgb(33, 29, 26);
+}
+
+.ct-dashboard-welcome .share-block .sep{
+    margin-top: 24px;
+    padding-top: 20px;
+    border-top: 1px solid rgb(220, 238, 227);
+}
+
+.ct-dashboard-welcome .share-block .sep h3{
+    margin: 0px 0px 11px; font-size: 12.5px; font-weight: 700; letter-spacing: 0.3px; color: rgb(138, 129, 117);
+}
+
+.ct-dashboard-welcome .share-block .ideas{
+    display: flex; flex-direction: column; gap: 9px;
+}
+
+.ct-dashboard-welcome .share-block .ideas div{
+    display: flex;
+    gap: 9px;
+    font-size: 14px;
+    line-height: 1.5;
+    color: rgb(122, 114, 102);
+}
+
+.ct-dashboard-welcome .share-block .ideas div span.line{
+    color: rgb(159, 184, 169); flex-shrink: 0;
+}
+
 .ct-dashboard-tasks,
 .ct-dashboard-edit {
   margin-bottom: 20px;
@@ -2154,7 +2269,7 @@ body.woocommerce-account .mlduo-account-menu{
   padding: 0;
   border: 0;
   background: none;
-  color: #1f9254;
+  color: #1f9254!important;
   cursor: pointer;
   font-family: inherit;
   font-size: 14px;

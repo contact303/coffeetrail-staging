@@ -63,24 +63,26 @@ if ( is_numeric( $coffeecart_owner ) ) {
         <div class="ct-account-preview__image">
             <span class="ct-account-preview__image-placeholder">
                 <?php if ( $owner_image_url ) : ?>
-
                     <img
                         src="<?php echo esc_url( $owner_image_url ); ?>"
                         class="ct-account-owner-image__img"
                         alt="<?php echo esc_attr( get_the_title( $listing_id ) ); ?>"
                     >
                 <?php else : ?>
-                <svg
-                    width="22"
-                    height="22"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    aria-hidden="true"
-                >
-                    <rect x="3" y="3" width="18" height="18" rx="3"></rect>
-                    <circle cx="8.5" cy="8.5" r="1.6"></circle>
-                    <path d="M21 15l-5-5L5 21"></path>
-                </svg>
+                    <?php
+                    $logo_url = wp_get_attachment_image_url(
+                        get_theme_mod('custom_logo'),
+                        'full'
+                    );
+
+                    if ( $logo_url ) :
+                    ?>
+                        <img
+                            src="<?php echo esc_url( $logo_url ); ?>"
+                            class="ct-account-owner-image__img"
+                            alt="<?php echo esc_attr( get_the_title( $listing_id ) ); ?>"
+                        >
+                    <?php endif; ?>
                 <?php endif; ?>
             </span>
         </div>

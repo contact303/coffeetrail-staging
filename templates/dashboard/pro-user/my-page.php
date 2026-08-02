@@ -1,48 +1,89 @@
 <?php
 defined( 'ABSPATH' ) || exit;
+$location_coffee = get_post_meta( $listing_id, '_location_coffee', true );
+$job_phone = get_post_meta( $listing_id, '_job_phone', true );
+$current_user_id = get_current_user_id();
+
+$listings_query = new WP_Query( [
+    'post_type'      => 'job_listing',
+    'author'         => $current_user_id,
+    'post_status'    => [ 'publish', 'pending', 'draft' ],
+    'posts_per_page' => -1,
+    'fields'         => 'ids',
+    'orderby'        => 'date',
+    'order'          => 'DESC',
+    'no_found_rows'  => true,
+] );
+
+$listing_ids    = array_map( 'intval', $listings_query->posts );
+$listings_count = count( $listing_ids );
+$has_multiple   = $listings_count > 1;
 ?>
 
 <section class="ct-account-page my-page">
 <?php if ( $listing_id ) : ?>
 <div class="ct-public-page">
- <div class="ct-public-page__header">
-  <div class="ct-public-page__heading">
-   <div class="ct-public-page__title-row">
-    <span class="ct-public-page__title">
-     עגלת קפה רוולה
-    </span>
-    <span class="ct-public-page__title-toggle">
-     <svg aria-hidden="true" class="ct-public-page__title-toggle-icon" fill="none" focusable="false" height="14" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.4" viewbox="0 0 24 24" width="14">
-      <polyline points="6 9 12 15 18 9">
-      </polyline>
-     </svg>
-    </span>
-   </div>
-   <p class="ct-public-page__subtitle">
-    כך העמוד שלכם נראה בקופיטרייל.
-   </p>
-  </div>
-  <div class="ct-public-page__actions">
-   <button class="ct-public-page__copy-button">
-    <svg aria-hidden="true" class="ct-public-page__copy-icon" fill="none" focusable="false" height="16" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" width="16">
-     <rect height="11" rx="2.5" width="11" x="9" y="9">
-     </rect>
-     <path d="M5 15V6a2 2 0 0 1 2-2h9">
-     </path>
-    </svg>
-    העתקת קישור
-   </button>
-   <button class="ct-public-page__view-button" title="כך העמוד נראה ללקוחות">
-    <svg aria-hidden="true" class="ct-public-page__view-icon" fill="none" focusable="false" height="17" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" width="17">
-     <path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7z">
-     </path>
-     <circle cx="12" cy="12" r="3">
-     </circle>
-    </svg>
-    צפו בעמוד
-   </button>
-  </div>
- </div>
+            <div class="ct-public-preview__header">
+              <div>
+                <div class="ct-public-preview__title-row">
+                  <h1 class="ct-public-preview__title"><span class="sc-interp"><?php echo esc_html( get_the_title( $listing_id ) ); ?></span></h1>
+                  <?php if ( $has_multiple ) : ?>
+                  <span class="ct-public-preview__title-toggle">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                  </span>                    
+
+                        <div class="ct-user-listings" hidden>
+
+                            <?php foreach ( $listing_ids as $user_listing_id ) : ?>
+                                <?php
+
+                                  $listing_package_id = absint(
+                                      get_post_meta(
+                                          $user_listing_id,
+                                          '_package_id',
+                                          true
+                                      )
+                                  );
+
+                                  $listing_plan_slug = in_array(
+                                      $listing_package_id,
+                                      [ 24 ],
+                                      true
+                                  ) ? 'pro' : 'free';
+
+                                  $listing_manage_url = ct_get_account_plan_url(
+                                      $listing_plan_slug,
+                                      'home',
+                                      $user_listing_id
+                                  );
+                                ?>
+                                <div
+                                    class="ct-user-listings__item <?php echo $user_listing_id === (int) $listing_id ? 'is-current' : ''; ?>"
+                                >
+                                  <a href="<?php echo esc_url( $listing_manage_url ); ?>">
+                                      <?php echo esc_html( get_the_title( $user_listing_id ) ); ?>
+                                  </a>
+                                </div>
+
+                            <?php endforeach; ?>
+
+                        </div>
+
+                    <?php endif; ?>
+                </div>
+                <p class="ct-public-preview__subtitle">כך העמוד שלכם נראה בקופיטרייל.</p>
+              </div>
+              <div class="ct-public-preview__actions">
+                <button class="link_copy ct-public-preview__copy-link" type="button" data-url="<?php echo esc_url( get_permalink( $listing_id ) ); ?>">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="11" height="11" rx="2.5"></rect><path d="M5 15V6a2 2 0 0 1 2-2h9"></path></svg>
+                  <span>העתקת קישור</span>
+                </button>
+                <a href="<?php echo esc_url( get_permalink( $listing_id ) ); ?>" target="_blank" class="ct-public-preview__view-link" title="כך העמוד נראה ללקוחות">
+                  <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                  צפו בעמוד
+                </a>
+              </div>
+            </div>
  <div class="ct-public-update">
   <div class="ct-public-update__content">
    <h3 class="ct-public-update__title">

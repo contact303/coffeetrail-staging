@@ -155,3 +155,118 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 });
+
+// Handle the WhatsApp share button click
+document.addEventListener('click', (event) => {
+    const button = event.target.closest(
+        '.ct-dashboard-welcome .share-buttons button.share-button.whatsapp'
+    );
+
+    if (!button) {
+        return;
+    }
+
+    const listingUrl = button.dataset.url;
+
+    if (!listingUrl) {
+        return;
+    }
+
+    const message = `עגלת קפה:\n${listingUrl}`;
+    const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(message)}`;
+
+    window.open(whatsappUrl, '_blank', 'noopener,noreferrer');
+});
+
+// Handle the Facebook share button click
+document.addEventListener('click', (event) => {
+    const button = event.target.closest(
+        '.ct-dashboard-welcome .share-buttons button.share-button.facebook'
+    );
+
+    if (!button) {
+        return;
+    }
+
+    const listingUrl = button.dataset.url;
+
+    if (!listingUrl) {
+        return;
+    }
+
+    const facebookShareUrl =
+        `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(listingUrl)}`;
+
+    window.open(
+        facebookShareUrl,
+        'facebook-share',
+        'width=680,height=520,noopener,noreferrer'
+    );
+});
+
+// Handle the copy link button click
+document.addEventListener('click', async (event) => {
+    const button = event.target.closest(
+        '.ct-dashboard-welcome .share-buttons button.share-button.copy-link'
+    );
+
+    if (!button) {
+        return;
+    }
+
+    const listingUrl = button.dataset.url;
+
+    if (!listingUrl) {
+        return;
+    }
+
+    try {
+        if (navigator.clipboard && window.isSecureContext) {
+            await navigator.clipboard.writeText(listingUrl);
+        } else {
+            fallbackCopyText(listingUrl);
+        }
+
+        const originalText = button.textContent;
+
+        button.textContent = 'הקישור הועתק';
+
+        setTimeout(() => {
+            button.textContent = originalText;
+        }, 2000);
+    } catch (error) {
+        console.error('Copy failed:', error);
+    }
+});
+
+function fallbackCopyText(text) {
+    const textarea = document.createElement('textarea');
+
+    textarea.value = text;
+    textarea.setAttribute('readonly', '');
+    textarea.style.position = 'fixed';
+    textarea.style.opacity = '0';
+    textarea.style.pointerEvents = 'none';
+
+    document.body.appendChild(textarea);
+
+    textarea.select();
+    textarea.setSelectionRange(0, textarea.value.length);
+
+    const copied = document.execCommand('copy');
+
+    document.body.removeChild(textarea);
+
+    if (!copied) {
+        throw new Error('Copy command failed');
+    }
+}
+
+// Handle the share button toggle
+document.addEventListener('click', (event) => {
+    const button = event.target.closest('.ct-dashboard-welcome__share-button');
+
+    if (!button) return;
+
+    button.parentElement.classList.toggle('is-active');
+});
