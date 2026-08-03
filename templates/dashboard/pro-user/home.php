@@ -187,7 +187,7 @@ defined( 'ABSPATH' ) || exit;
    הכירו דרכים נוספות להגדיל את החשיפה של העגלה שלכם.
   </p>
   <div class="ct-dashboard-exposure__list">
-   <button class="ct-dashboard-opportunity ct-dashboard-opportunity--featured">
+   <a href="/my-account/pro/exposure-opportunities/?listing_id=<?php echo esc_attr( $listing_id ); ?>" class="ct-dashboard-opportunity ct-dashboard-opportunity--featured">
     <span class="ct-dashboard-opportunity__icon ct-dashboard-opportunity__icon--featured">
      <svg aria-hidden="true" class="ct-dashboard-opportunity__svg" fill="none" focusable="false" height="20" stroke="#1F9254" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" viewbox="0 0 24 24" width="20">
       <path d="M12 21s-7-5.6-7-11a7 7 0 0 1 14 0c0 5.4-7 11-7 11z">
@@ -207,8 +207,8 @@ defined( 'ABSPATH' ) || exit;
     <span class="ct-dashboard-opportunity__badge">
      חדש
     </span>
-   </button>
-   <button class="ct-dashboard-opportunity">
+   </a>
+   <a href="/my-account/pro/exposure-opportunities/?listing_id=<?php echo esc_attr( $listing_id ); ?>" class="ct-dashboard-opportunity">
     <span class="ct-dashboard-opportunity__icon">
      <svg aria-hidden="true" class="ct-dashboard-opportunity__svg" fill="none" focusable="false" height="19" stroke="#5E574B" stroke-width="1.7" viewbox="0 0 24 24" width="19">
       <rect height="18" rx="5" width="18" x="3" y="3">
@@ -230,8 +230,8 @@ defined( 'ABSPATH' ) || exit;
     <span class="ct-dashboard-opportunity__action">
      איך זה עובד &larr;
     </span>
-   </button>
-   <button class="ct-dashboard-opportunity">
+   </a>
+   <a href="/my-account/pro/exposure-opportunities/?listing_id=<?php echo esc_attr( $listing_id ); ?>" class="ct-dashboard-opportunity">
     <span class="ct-dashboard-opportunity__icon">
      <svg aria-hidden="true" class="ct-dashboard-opportunity__svg" fill="none" focusable="false" height="19" stroke="#5E574B" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.7" viewbox="0 0 24 24" width="19">
       <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z">
@@ -249,7 +249,7 @@ defined( 'ABSPATH' ) || exit;
     <span class="ct-dashboard-opportunity__action">
      איך זה עובד &larr;
     </span>
-   </button>
+   </a>
   </div>
  </div>
 </div>

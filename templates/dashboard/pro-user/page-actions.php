@@ -44,7 +44,7 @@ defined( 'ABSPATH' ) || exit;
    </div>
   </div>
  </div>
- <button class="ct-analytics-pango">
+ <a href="/my-account/pro/exposure-opportunities/?listing_id=<?php echo esc_attr( $listing_id ); ?>" class="ct-analytics-pango">
   <svg aria-hidden="true" class="ct-analytics-pango__icon" fill="none" focusable="false" height="15" stroke="#8A8175" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" viewbox="0 0 24 24" width="15">
    <path d="M12 21s-7-5.6-7-11a7 7 0 0 1 14 0c0 5.4-7 11-7 11z">
    </path>
@@ -57,7 +57,7 @@ defined( 'ABSPATH' ) || exit;
   <span class="ct-analytics-pango__action">
    גלו איך &larr;
   </span>
- </button>
+ </a>
  <h2 class="ct-analytics-section__title">
   מאיפה אנשים הגיעו
  </h2>
@@ -146,12 +146,12 @@ defined( 'ABSPATH' ) || exit;
    העמוד שלכם עובד בשבילכם מסביב לשעון. כמה צעדים קטנים עוזרים ליותר אנשים למצוא אתכם ולבחור להגיע.
   </p>
   <div class="ct-analytics-cta__actions">
-   <button class="ct-analytics-cta__button ct-analytics-cta__button--primary">
+   <a href="/my-account/pro/exposure-opportunities/?listing_id=<?php echo esc_attr( $listing_id ); ?>" class="ct-analytics-cta__button ct-analytics-cta__button--primary">
     הגדלת חשיפה
-   </button>
-   <button class="ct-analytics-cta__button ct-analytics-cta__button--secondary">
+   </a>
+   <a href="/my-account/pro/my-page/?listing_id=<?php echo esc_attr( $listing_id ); ?>" class="ct-analytics-cta__button ct-analytics-cta__button--secondary">
     עדכון העמוד
-   </button>
+   </a>
   </div>
  </div>
 </div>

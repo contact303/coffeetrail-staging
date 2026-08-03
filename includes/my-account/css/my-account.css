@@ -2406,6 +2406,7 @@ body.woocommerce-account .mlduo-account-menu{
   cursor: pointer;
   font-family: inherit;
   text-align: right;
+  color: #000!important;
 }
 .ct-dashboard-opportunity--featured {
   border-width: 1.5px;
@@ -2427,6 +2428,97 @@ body.woocommerce-account .mlduo-account-menu{
   border-color: #cde6d6;
   background: #fffdf9;
 }
+
+.ct-pango-benefits {
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 1px solid #f0ebe0;
+}
+
+.ct-pango-benefits__title {
+    margin: 0 0 13px;
+    font-family: inherit !important;
+    font-size: 15px !important;
+    font-weight: 800 !important;
+}
+
+.ct-pango-benefits__list {
+    display: flex;
+    flex-direction: column;
+    gap: 11px;
+    margin-bottom: 20px;
+}
+
+.ct-pango-benefits__item {
+    display: flex;
+    align-items: center;
+    gap: 11px;
+}
+
+.ct-pango-benefits__check {
+    display: flex;
+    flex-shrink: 0;
+    align-items: center;
+    justify-content: center;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: #eaf3ec;
+}
+
+.ct-pango-benefits__check-icon {
+    stroke: #1f9254;
+    stroke-width: 2.6;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+.ct-pango-benefits__text {
+    color: #3a332c;
+    font-size: 15px;
+}
+
+.ct-pango-benefits__offer {
+    margin-bottom: 20px;
+    padding: 16px 18px;
+    border: 1px solid #cde6d6;
+    border-radius: 13px;
+    background: #eaf3ec;
+}
+
+.ct-pango-benefits__offer-title {
+    margin: 0 0 4px;
+    color: #1a7d47;
+    font-size: 14px;
+    font-weight: 800;
+}
+
+.ct-pango-benefits__offer-description {
+    margin: 0;
+    color: #1a7d47;
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+.ct-pango-benefits__button {
+    padding: 12px 26px;
+    border: 0;
+    border-radius: 999px;
+    background: #1f9254;
+    color: #fff;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 15px;
+    font-weight: 700;
+    box-shadow: 0 2px 8px rgba(31, 146, 84, 0.25);
+}
+
+@media (max-width: 600px) {
+    .ct-pango-benefits__button {
+        width: 100%;
+    }
+}
+
 .ct-dashboard-opportunity__svg {
   stroke: #5e574b;
   stroke-width: 1.7;
@@ -3443,7 +3535,7 @@ body.woocommerce-account .mlduo-account-menu{
 .ct-analytics-cta__button--secondary {
     border: 1px solid #cde6d6;
     background: #fffdf9;
-    color: #19613b;
+    color: #19613b !important;
 }
 
 @media (max-width: 600px) {
@@ -4063,5 +4155,614 @@ body.woocommerce-account .mlduo-account-menu{
 
     .ct-settings-cart__contact-value {
         white-space: normal;
+    }
+}
+
+/* Pango modals */
+
+.ct-pango-modal[hidden] {
+    display: none !important;
+}
+
+.ct-pango-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    background: rgba(33, 29, 26, 0.55);
+}
+
+.ct-pango-modal__dialog {
+    position: relative;
+    width: 100%;
+    max-width: 560px;
+    max-height: 90vh;
+    overflow-y: auto;
+    border-radius: 22px;
+    background: #fffdf9;
+    box-shadow: 0 24px 70px rgba(0, 0, 0, 0.28);
+}
+
+.ct-pango-modal__close {
+    position: absolute;
+    top: 18px;
+    left: 18px;
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    padding: 0;
+    border: 0;
+    border-radius: 50%;
+    background: #f4efe6;
+    color: #5e574b;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 18px;
+    line-height: 1;
+}
+
+.ct-pango-modal__content {
+    padding: 34px 30px 30px;
+}
+
+.ct-pango-modal__badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    margin-bottom: 16px;
+    padding: 5px 13px;
+    border: 1px solid #e4dccd;
+    border-radius: 999px;
+    background: #f4efe6;
+    color: #5e574b;
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.ct-pango-modal__badge-icon {
+    stroke: #1f9254;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+.ct-pango-modal__title {
+    margin: 0 0 8px;
+    font-family: inherit !important;
+    font-size: clamp(21px, 5vw, 25px) !important;
+    font-weight: 800 !important;
+    line-height: 1.25;
+}
+
+.ct-pango-modal__intro {
+    margin: 0 0 24px;
+    color: #8a8175;
+    font-size: 15px;
+    line-height: 1.6;
+}
+
+.ct-pango-modal__benefit {
+    margin-bottom: 26px;
+    padding: 16px 18px;
+    border: 1px solid #cde6d6;
+    border-radius: 14px;
+    background: #eaf3ec;
+}
+
+.ct-pango-modal__benefit-title {
+    margin: 0 0 4px;
+    color: #1a7d47;
+    font-size: 14px;
+    font-weight: 800;
+}
+
+.ct-pango-modal__benefit-text {
+    margin: 0;
+    color: #1a7d47;
+    font-size: 14px;
+    line-height: 1.55;
+}
+
+.ct-pango-modal__section-title {
+    margin: 0 0 14px;
+    font-family: inherit !important;
+    font-size: 16px !important;
+    font-weight: 800 !important;
+}
+
+.ct-pango-modal__steps {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    margin-bottom: 22px;
+}
+
+.ct-pango-modal__step {
+    display: flex;
+    align-items: flex-start;
+    gap: 13px;
+}
+
+.ct-pango-modal__step-number {
+    display: flex;
+    flex-shrink: 0;
+    align-items: center;
+    justify-content: center;
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    background: #211d1a;
+    color: #fff;
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.ct-pango-modal__step-content {
+    flex: 1 1 0;
+}
+
+.ct-pango-modal__step-text {
+    margin: 0;
+    color: #3a332c;
+    font-size: 15px;
+    line-height: 1.55;
+}
+
+.ct-pango-modal__step-text--spaced {
+    margin-bottom: 10px;
+}
+
+.ct-pango-modal__code-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px;
+}
+
+.ct-pango-modal__code {
+    padding: 9px 18px;
+    border: 1.5px dashed #1f9254;
+    border-radius: 11px;
+    background: #eaf3ec;
+    color: #1a7d47;
+    direction: ltr;
+    font-size: 19px;
+    font-weight: 800;
+    letter-spacing: 1.5px;
+}
+
+.ct-pango-modal__copy-button {
+    display: inline-flex;
+    flex-shrink: 0;
+    align-items: center;
+    gap: 7px;
+    padding: 10px 18px;
+    border: 0;
+    border-radius: 999px;
+    background: #1f9254;
+    color: #fff;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 700;
+    box-shadow: 0 2px 8px rgba(31, 146, 84, 0.22);
+}
+
+.ct-pango-modal__copy-icon {
+    stroke: currentColor;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+.ct-pango-modal__code-note {
+    margin: 8px 0 0;
+    color: #8a8175;
+    font-size: 13px;
+    line-height: 1.5;
+}
+
+.ct-pango-modal__videos {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 24px;
+}
+
+.ct-pango-modal__video {
+    display: flex;
+    align-items: center;
+    gap: 13px;
+    padding: 13px 15px;
+    border: 1px solid #e4dccd;
+    border-radius: 13px;
+    background: #fbf9f4;
+    text-decoration: none;
+}
+
+.ct-pango-modal__video-icon {
+    display: flex;
+    flex-shrink: 0;
+    align-items: center;
+    justify-content: center;
+    width: 38px;
+    height: 38px;
+    border-radius: 10px;
+    background: #fdecea;
+}
+
+.ct-pango-modal__video-play {
+    fill: #e23b2e;
+}
+
+.ct-pango-modal__video-content {
+    flex: 1 1 0;
+}
+
+.ct-pango-modal__video-title,
+.ct-pango-modal__video-meta {
+    display: block;
+}
+
+.ct-pango-modal__video-title {
+    color: #3a332c;
+    font-size: 15px;
+    font-weight: 600;
+}
+
+.ct-pango-modal__video-meta {
+    color: #8a8175;
+    font-size: 13px;
+}
+
+.ct-pango-modal__video-arrow {
+    flex-shrink: 0;
+    stroke: #8a8175;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+.ct-pango-modal__notice {
+    margin-bottom: 26px;
+    padding: 15px 17px;
+    border: 1px solid #eedfbc;
+    border-radius: 13px;
+    background: #fcf7ec;
+}
+
+.ct-pango-modal__notice-title {
+    margin: 0 0 9px;
+    color: #8a5e12;
+    font-size: 14px;
+    font-weight: 800;
+}
+
+.ct-pango-modal__notice-list {
+    margin: 0;
+    padding-inline-start: 18px;
+    color: #6e5a2e;
+    font-size: 13.5px;
+    line-height: 1.7;
+}
+
+.ct-pango-modal__confirm,
+.ct-pango-success__button {
+    width: 100%;
+    padding: 15px;
+    border: 0;
+    border-radius: 999px;
+    background: #1f9254;
+    color: #fff;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 16px;
+    font-weight: 700;
+    box-shadow: 0 2px 10px rgba(31, 146, 84, 0.28);
+}
+
+.ct-pango-modal__confirm {
+    margin-bottom: 10px;
+}
+
+.ct-pango-modal__later {
+    display: block;
+    width: 100%;
+    padding: 6px;
+    border: 0;
+    background: none;
+    color: #8a8175;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 15px;
+    font-weight: 600;
+}
+
+/* Success modal */
+
+.ct-pango-modal__dialog--success {
+    max-width: 560px;
+}
+
+.ct-pango-success {
+    padding: 44px 32px 34px;
+    text-align: center;
+}
+
+.ct-pango-success__icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 64px;
+    height: 64px;
+    margin-bottom: 20px;
+    border-radius: 50%;
+    background: #eaf3ec;
+}
+
+.ct-pango-success__icon svg {
+    stroke: #1f9254;
+    stroke-width: 2.6;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+.ct-pango-success__title {
+    margin: 0 0 10px;
+    font-family: inherit !important;
+    font-size: 23px !important;
+    font-weight: 800 !important;
+}
+
+.ct-pango-success__description {
+    margin: 0 0 26px;
+    color: #8a8175;
+    font-size: 15px;
+    line-height: 1.6;
+}
+
+body.ct-pango-modal-open {
+    overflow: hidden;
+}
+
+@media (max-width: 600px) {
+    .ct-pango-modal {
+        padding: 12px;
+    }
+
+    .ct-pango-modal__content,
+    .ct-pango-success {
+        padding: 42px 20px 26px;
+    }
+
+    .ct-pango-modal__code {
+        width: 100%;
+        text-align: center;
+    }
+
+    .ct-pango-modal__copy-button {
+        width: 100%;
+        justify-content: center;
+    }
+}
+
+.ct-instagram-benefits {
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 1px solid #f0ebe0;
+}
+
+.ct-instagram-benefits__title {
+    margin: 0 0 14px;
+    font-family: inherit !important;
+    font-size: 15px !important;
+    font-weight: 800 !important;
+}
+
+.ct-instagram-benefits__steps {
+    display: flex;
+    flex-direction: column;
+    gap: 13px;
+    margin-bottom: 22px;
+}
+
+.ct-instagram-benefits__step {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.ct-instagram-benefits__step-number {
+    display: flex;
+    flex-shrink: 0;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: #211d1a;
+    color: #fff;
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.ct-instagram-benefits__step-text {
+    color: #3a332c;
+    font-size: 15px;
+}
+
+.ct-instagram-benefits__handle {
+    display: inline-block;
+    color: #1f9254;
+    direction: ltr;
+    font-weight: 700;
+}
+
+.ct-instagram-benefits__notice {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 22px;
+    padding: 12px 15px;
+    border: 1px solid #ece5d8;
+    border-radius: 12px;
+    background: #f6f1e8;
+}
+
+.ct-instagram-benefits__notice-icon {
+    flex-shrink: 0;
+    stroke: #5e574b;
+    stroke-width: 1.9;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+.ct-instagram-benefits__notice-text {
+    flex: 1 1 0;
+    color: #3c362f;
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+.ct-instagram-benefits__tags-title {
+    margin: 0 0 11px;
+    color: #8a8175;
+    font-size: 14px;
+    font-weight: 700;
+}
+
+.ct-instagram-benefits__tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 9px;
+    margin-bottom: 22px;
+}
+
+.ct-instagram-benefits__tag {
+    padding: 7px 15px;
+    border: 1px solid #ece5d8;
+    border-radius: 999px;
+    background: #f4efe6;
+    color: #5e574b;
+    font-size: 14px;
+}
+
+.ct-instagram-benefits__button {
+    padding: 12px 26px;
+    border: 0;
+    border-radius: 999px;
+    background: #1f9254;
+    color: #fff;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 15px;
+    font-weight: 700;
+    box-shadow: 0 2px 8px rgba(31, 146, 84, 0.25);
+}
+
+@media (max-width: 600px) {
+    .ct-instagram-benefits__step {
+        align-items: flex-start;
+    }
+
+    .ct-instagram-benefits__button {
+        width: 100%;
+    }
+}
+
+.ct-community-benefits {
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 1px solid #f0ebe0;
+}
+
+.ct-community-benefits__title {
+    margin: 0 0 14px;
+    font-family: inherit !important;
+    font-size: 15px !important;
+    font-weight: 800 !important;
+}
+
+.ct-community-benefits__steps {
+    display: flex;
+    flex-direction: column;
+    gap: 13px;
+    margin-bottom: 22px;
+}
+
+.ct-community-benefits__step {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.ct-community-benefits__step-number {
+    display: flex;
+    flex-shrink: 0;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: #211d1a;
+    color: #fff;
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.ct-community-benefits__step-text {
+    color: #3a332c;
+    font-size: 15px;
+}
+
+.ct-community-benefits__ideas-title {
+    margin: 0 0 11px;
+    color: #8a8175;
+    font-size: 14px;
+    font-weight: 700;
+}
+
+.ct-community-benefits__ideas {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 9px;
+    margin-bottom: 22px;
+}
+
+.ct-community-benefits__idea {
+    padding: 7px 15px;
+    border: 1px solid #ece5d8;
+    border-radius: 999px;
+    background: #f4efe6;
+    color: #5e574b;
+    font-size: 14px;
+}
+
+.ct-community-benefits__button {
+    padding: 12px 26px;
+    border: 0;
+    border-radius: 999px;
+    background: #1f9254;
+    color: #fff;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 15px;
+    font-weight: 700;
+    box-shadow: 0 2px 8px rgba(31, 146, 84, 0.25);
+}
+
+@media (max-width: 600px) {
+    .ct-community-benefits__step {
+        align-items: flex-start;
+    }
+
+    .ct-community-benefits__button {
+        width: 100%;
     }
 }
