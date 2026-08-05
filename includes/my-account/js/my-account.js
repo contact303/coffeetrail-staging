@@ -503,7 +503,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 });
 
-// Handle the benefit toggle functionality
+// Handle the benefit toggle functionality  
 document.addEventListener('DOMContentLoaded', () => {
     document
         .querySelectorAll(
