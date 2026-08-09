@@ -21,11 +21,19 @@ wp_enqueue_style(
 );
 
 wp_enqueue_script(
-	'coffeetrail-auth',
-	get_stylesheet_directory_uri() . '/includes/my-account/js/coffeetrail-auth.js',
-	[],
-	file_exists( $auth_js ) ? filemtime( $auth_js ) : null,
-	true
+    'coffeetrail-auth',
+    get_stylesheet_directory_uri() . '/includes/my-account/js/coffeetrail-auth.js',
+    [],
+    file_exists( $auth_js ) ? filemtime( $auth_js ) : null,
+    true
+);
+
+wp_localize_script(
+    'coffeetrail-auth',
+    'ctAuth',
+    [
+        'ajaxUrl' => admin_url( 'admin-ajax.php' ),
+    ]
 );
 
 do_action( 'woocommerce_before_customer_login_form' );

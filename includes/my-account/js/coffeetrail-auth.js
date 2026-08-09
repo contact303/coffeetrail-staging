@@ -127,3 +127,108 @@ document.addEventListener('DOMContentLoaded', function () {
       providerRow.remove();
     });
 });
+
+// Handle OTP registration form submission
+// Handle OTP registration form submission
+document.addEventListener('submit', async (event) => {
+    const form = event.target.closest(
+        '#ct-form-email-register, #ct-form-otp, #ct-form-otp-resend'
+    );
+
+    if (!form) {
+        return;
+    }
+
+    event.preventDefault();
+
+    const container = form.closest('.ct-email-register');
+
+    if (!container) {
+        return;
+    }
+
+    const formData = new FormData(form);
+
+    formData.append('action', 'ct_register_otp');
+
+    container.classList.add('is-loading');
+
+    try {
+        const response = await fetch(ctAuth.ajaxUrl, {
+            method: 'POST',
+            body: formData,
+            credentials: 'same-origin'
+        });
+
+        const result = await response.json();
+
+        console.log('OTP response:', result);
+
+        if (!result.success) {
+            throw new Error(
+                result.data?.message || 'Registration request failed'
+            );
+        }
+
+        if (result.data?.redirect) {
+            window.location.assign(result.data.redirect);
+            return;
+        }
+
+        if (result.data?.html) {
+            container.outerHTML = result.data.html;
+            initOtpResendTimer();
+        }
+
+    } catch (error) {
+        console.error('OTP registration error:', error);
+
+    } finally {
+        const newContainer = document.querySelector('.ct-email-register');
+
+        if (newContainer) {
+            newContainer.classList.remove('is-loading');
+        }
+    }
+});
+
+// Initialize OTP resend timer
+function initOtpResendTimer(scope = document) {
+    const button = scope.querySelector('#ct-otp-resend-btn');
+    const timer = scope.querySelector('#ct-otp-resend-timer');
+
+    if (!button || !timer) {
+        return;
+    }
+
+    // מונע הפעלה כפולה.
+    if (button.dataset.timerInitialized === '1') {
+        return;
+    }
+
+    button.dataset.timerInitialized = '1';
+
+    let seconds = 30;
+
+    button.disabled = true;
+    timer.textContent = `(${seconds})`;
+
+    const interval = setInterval(() => {
+        seconds--;
+
+        if (seconds > 0) {
+            timer.textContent = `(${seconds})`;
+            return;
+        }
+
+        clearInterval(interval);
+
+        timer.textContent = '';
+        button.disabled = false;
+        button.removeAttribute('disabled');
+    }, 1000);
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    initOtpResendTimer();
+});

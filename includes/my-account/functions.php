@@ -2,6 +2,9 @@
 
 defined( 'ABSPATH' ) || exit;
 
+// Load the register-otp.php file to handle OTP registration functionality.
+require_once get_stylesheet_directory()
+    . '/includes/my-account/register-otp.php';
 
 /**
  * טעינת קובץ העיצוב של האזור האישי.
