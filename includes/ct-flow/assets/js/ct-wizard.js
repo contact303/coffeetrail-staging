@@ -536,6 +536,29 @@
         $('#ct-help-trigger').toggle(!isLanding);
     }
 
+    /**
+     * Sync the persistent header's three-segment group indicator ("שלב N
+     * מתוך 3") with the newly loaded step. Mirrors updateHeaderForStep()'s
+     * pattern: the header is rendered once server-side, so AJAX step loads
+     * must update it here rather than relying on a fresh render.
+     *
+     * @param {{index: number, total: number}|null} group  From ajax_load_step's
+     *   'group' field (CT_Flow_Wizard_Controller::get_step_group()). Null on
+     *   landing/success — the indicator is hidden in that case.
+     */
+    function updateGroupIndicator(group) {
+        const $indicator = $('.ct-wizard-group-indicator');
+        if (!group) {
+            $indicator.hide();
+            return;
+        }
+        $indicator.show().attr({ 'aria-valuenow': group.index, 'aria-valuemax': group.total });
+        $indicator.find('.ct-wizard-group-indicator__label').text('שלב ' + group.index + ' מתוך ' + group.total);
+        $indicator.find('.ct-wizard-group-indicator__segment').each(function (i) {
+            $(this).toggleClass('is-active', (i + 1) <= group.index);
+        });
+    }
+
     function loadStep(stepKey) {
         setLoading(true);
 
@@ -556,9 +579,8 @@
                 $(SEL.container).data('step', stepKey);
                 $(SEL.stepContent).html(response.data.html);
 
-                // Update the persistent header with the new step's label and progress.
-                $('.ct-wizard-header__step-label').text(response.data.label || '');
-                $('.ct-wizard-progress__bar').css('width', (response.data.progress || 0) + '%');
+                // Update the persistent header's group indicator with the new step's group.
+                updateGroupIndicator(response.data.group);
 
                 // Swap header buttons between landing ("יציאה") and all other steps
                 // ("שמירה ויציאה" + "שאלות?"). The header is rendered once server-side

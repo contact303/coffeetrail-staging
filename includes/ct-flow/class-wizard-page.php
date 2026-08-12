@@ -358,6 +358,7 @@ class CT_Flow_Wizard_Page {
 			'html'     => $html,
 			'label'    => CT_Flow_Wizard_Controller::STEPS[ $step ]['label'] ?? '',
 			'progress' => CT_Flow_Wizard_Controller::get_progress( $step, $package ),
+			'group'    => CT_Flow_Wizard_Controller::get_step_group( $step ),
 		] );
 	}
 

@@ -2,8 +2,8 @@
 /**
  * Wizard Header Template
  *
- * Renders the persistent top bar: logo badge (RIGHT, first DOM) + action buttons (LEFT, last DOM).
- * No progress bar, no center step label — matches Figma design (Z8TzfW2y9vAOg3HBlwXtuZ).
+ * Renders the persistent top bar: logo badge (RIGHT, first DOM) + action buttons (LEFT, last DOM),
+ * plus a three-segment group indicator ("שלב N מתוך 3") below the inner row.
  *
  * Variables expected from parent template:
  *   @var string $current_step       Current step key.
@@ -23,6 +23,8 @@ if ( $current_step === 'success' ) {
 
 $logo_url   = CT_Flow_Wizard_Page::get_logo_url();
 $is_landing = $current_step === 'landing';
+$step_group = CT_Flow_Wizard_Controller::get_step_group( $current_step );
+$group_total = count( CT_Flow_Wizard_Controller::STEP_GROUPS );
 // All three buttons are always in the DOM so AJAX navigation can swap them
 // without a page reload. PHP sets initial visibility; JS (updateHeaderForStep)
 // toggles display on each step change.
@@ -90,6 +92,27 @@ $is_landing = $current_step === 'landing';
 		</div>
 
 	</div>
-	<!-- Progress bar hidden per Figma, kept in DOM for progressive enhancement -->
-	<div class="ct-wizard-progress" role="progressbar" aria-hidden="true" style="display:none;"></div>
+
+	<!--
+		Three-segment group indicator ("שלב N מתוך 3"). Always in the DOM (same
+		pattern as the header buttons above) so AJAX step loads can update it via
+		ct-wizard.js (updateGroupIndicator) without a full header re-render.
+		Hidden on landing/success, where get_step_group() returns null.
+	-->
+	<div class="ct-wizard-group-indicator"
+		role="progressbar"
+		aria-label="התקדמות בטופס"
+		aria-valuemin="1"
+		aria-valuemax="<?php echo esc_attr( $group_total ) ?>"
+		aria-valuenow="<?php echo esc_attr( $step_group['index'] ?? 1 ) ?>"
+		<?php if ( ! $step_group ) : ?>style="display:none;"<?php endif ?>>
+		<span class="ct-wizard-group-indicator__label">
+			<?php echo $step_group ? esc_html( sprintf( 'שלב %d מתוך %d', $step_group['index'], $step_group['total'] ) ) : '' ?>
+		</span>
+		<div class="ct-wizard-group-indicator__segments">
+			<?php for ( $i = 1; $i <= $group_total; $i++ ) : ?>
+				<span class="ct-wizard-group-indicator__segment<?php echo ( $step_group && $i <= $step_group['index'] ) ? ' is-active' : '' ?>"></span>
+			<?php endfor ?>
+		</div>
+	</div>
 </header>

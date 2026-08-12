@@ -58,6 +58,7 @@ class CT_Flow_Wizard_Controller {
 		'basics'           => [ 'template' => 'basics',          'label' => 'פרטי בסיס',     'required' => true  ],
 		'contact'          => [ 'template' => 'contact',         'label' => 'יצירת קשר',     'required' => true  ],
 		'location'         => [ 'template' => 'location',        'label' => 'מיקום',         'required' => true  ],
+		'intro-1-outro'    => [ 'template' => 'intro-1-outro',   'label' => '',              'required' => false ],
 		'intro-2'          => [ 'template' => 'step-intro',      'label' => 'שלב 2',         'required' => false ],
 		'amenities'        => [ 'template' => 'amenities',       'label' => 'מאפיינים',      'required' => false ],
 		'menu-categories'  => [ 'template' => 'menu-categories', 'label' => 'קטגוריות תפריט','required' => false ],
@@ -70,6 +71,28 @@ class CT_Flow_Wizard_Controller {
 		'terms'            => [ 'template' => 'terms',           'label' => 'תנאים',         'required' => true  ],
 		'payment'          => [ 'template' => 'payment',         'label' => 'תשלום',         'required' => true  ],
 		'success'          => [ 'template' => 'success',         'label' => 'סיום',          'required' => false ],
+	];
+
+	/**
+	 * Content-only steps that collect no field data — the intro screens plus
+	 * the post-location "you're live" outro. Single source of truth for
+	 * "which steps are informational": consulted by get_progress() (excluded
+	 * from the percentage denominator) and by get_step_group() (identifies
+	 * which group a content-only step belongs to). Update this list, not the
+	 * methods that read it, when adding/removing an informational step.
+	 */
+	const INFO_STEPS = [ 'intro-1', 'intro-2', 'intro-3', 'intro-1-outro' ];
+
+	/**
+	 * Step-group membership for the three-segment header indicator
+	 * ("שלב N מתוך 3"). Each group is opened by an intro screen; group 1 is
+	 * additionally closed by the post-location outro screen. `landing` and
+	 * `success` are intentionally absent — they sit outside the grouping.
+	 */
+	const STEP_GROUPS = [
+		1 => [ 'intro-1', 'basics', 'contact', 'location', 'intro-1-outro' ],
+		2 => [ 'intro-2', 'amenities', 'menu-categories', 'images', 'menu-upload', 'menu-details', 'social-links' ],
+		3 => [ 'intro-3', 'hours', 'terms', 'payment' ],
 	];
 
 	public static function init() {
@@ -227,7 +250,7 @@ class CT_Flow_Wizard_Controller {
 	public static function get_progress( string $current_step, string $listing_package = 'free' ): int {
 		$non_ui_steps = array_filter(
 			self::get_step_order( $listing_package ),
-			fn( $k ) => ! in_array( $k, [ 'landing', 'intro-1', 'intro-2', 'intro-3', 'success' ], true )
+			fn( $k ) => ! in_array( $k, array_merge( [ 'landing', 'success' ], self::INFO_STEPS ), true )
 		);
 		$non_ui_steps = array_values( $non_ui_steps );
 		$idx          = array_search( $current_step, $non_ui_steps, true );
@@ -237,6 +260,26 @@ class CT_Flow_Wizard_Controller {
 		}
 
 		return (int) round( ( $idx / ( count( $non_ui_steps ) - 1 ) ) * 100 );
+	}
+
+	/**
+	 * Return the current step's group index (1-based) and total group count,
+	 * for the three-segment header indicator ("שלב N מתוך 3").
+	 *
+	 * `landing` and `success` sit outside the grouping entirely — callers
+	 * must render no indicator when this returns null.
+	 *
+	 * @param string $current_step
+	 * @return array{index:int,total:int}|null
+	 */
+	public static function get_step_group( string $current_step ): ?array {
+		foreach ( self::STEP_GROUPS as $index => $steps ) {
+			if ( in_array( $current_step, $steps, true ) ) {
+				return [ 'index' => $index, 'total' => count( self::STEP_GROUPS ) ];
+			}
+		}
+
+		return null;
 	}
 
 	// =========================================================================
