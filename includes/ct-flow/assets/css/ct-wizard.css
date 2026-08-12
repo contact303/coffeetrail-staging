@@ -19,22 +19,24 @@
    1. CSS Variables
    ============================================================================ */
 
+   @import url('https://fonts.googleapis.com/css2?family=Rubik:ital,wght@0,300..900;1,300..900&display=swap');
+
 :root {
     /* Brand colors — extracted from Figma (Z8TzfW2y9vAOg3HBlwXtuZ),
        validation palette aligned to node 1269-8. */
-    --cw-green:          #00a93e;
+    --cw-green:          rgb(31, 146, 84);
     --cw-green-dark:     #008c35;
     --cw-green-light:    #dcfce7;
     --cw-green-bg:       #f6fef9;
     --cw-success:        #109e81;
     --cw-error:          #f97216;
     --cw-error-light:    #fef3f2;
-    --cw-border-idle:    #d1d5db;
+    --cw-border-idle:    rgb(210, 201, 184);
     --cw-border-section: #e5e7eb;
     --cw-border-focused: #00a93e;
     --cw-border-valid:   #109e81;
     --cw-border-error:   #f97216;
-    --cw-text:           #101828;
+    --cw-text:           rgb(43, 38, 34);
     --cw-text-secondary: #4a5565;
     --cw-text-muted:     #6b7280;
     --cw-placeholder:    #9ca3af;
@@ -74,43 +76,50 @@
     display: flex;
     flex-direction: column;
     min-height: 100vh;
-    background: #ffffff;
+    background: rgb(244, 238, 227);
 }
 
 #ct-wizard-step-content {
     flex: 1;
     padding: 32px 24px calc(var(--cw-footer-h) + 32px);
-    max-width: var(--cw-content-max);
+    max-width: 920px;
     width: 100%;
     margin: 0 auto;
+}
+
+#ct-wizard-step-content *{
+    font-family: "Rubik", Sans-serif !important;
 }
 
 /* ============================================================================
    3. Wizard Header
    ============================================================================ */
 
+       html body.admin-bar {
+        margin-top: 0 !important;
+    }
+
 .ct-wizard-header {
     /* NOT sticky — static so content flows naturally */
     background: #ffffff;
     border-bottom: 1px solid var(--cw-border-section);
-    height: var(--cw-header-h);
     flex-shrink: 0;
 }
 
 .ct-wizard-header__inner {
+    max-width: 1040px;
+    margin: 0px auto;
+    padding: 13px 24px;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    height: var(--cw-header-h);
-    padding: 0 24px;
+    gap: 12px;
 }
 
 /* ---- Logo badge (RIGHT side in RTL = first DOM child) ---- */
 .ct-wizard-header__logo-badge {
     width: 48px;
     height: 48px;
-    background: #000000;
-    border-radius: 10px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -119,8 +128,7 @@
 }
 
 .ct-wizard-header__logo-badge img {
-    width: 24px;
-    height: 24px;
+    width: 100%;
     display: block;
 }
 
@@ -140,6 +148,7 @@
     display: flex;
     align-items: center;
     gap: 16px;
+        flex-direction: row-reverse;
 }
 
 .ct-wizard-header__save-exit-btn {
@@ -166,14 +175,19 @@
 }
 
 .ct-wizard-header__questions-btn {
+display: inline-flex;
+    align-items: center;
+    gap: 6px;
     background: none;
-    border: none;
+    border-width: medium;
+    border-style: none;
+    border-color: currentcolor;
+    border-image: none;
     cursor: pointer;
+    color: rgb(138, 129, 117);
     font-size: 14px;
-    font-weight: 500;
-    color: #4a5565;
-    padding: 0;
-    font-family: inherit;
+    font-weight: 600;
+    padding: 6px;
     transition: color var(--cw-transition);
 }
 
@@ -206,8 +220,9 @@
     right: 0;
     left: 0;
     z-index: 100;
-    background: #ffffff;
-    border-top: 1px solid var(--cw-border-section);
+    background: rgba(244, 238, 227, 0.94);
+    backdrop-filter: blur(8px);
+    border-top: 1px solid rgb(234, 227, 214);
     height: var(--cw-footer-h);
     display: flex;
     align-items: center;
@@ -215,12 +230,14 @@
 }
 
 .ct-wizard-footer__inner {
+    max-width: 100%;
+    width: 680px;
+    margin: 0px auto;
+    padding: 16px 24px;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    width: 100%;
-    padding: 0 24px;
-    gap: 16px;
+    gap: 14px;
 }
 
 .ct-wizard-footer__message {
@@ -255,14 +272,18 @@
 
 /* Next / primary action — LEFT side visually (RTL end) */
 .ct-wizard-btn--next {
-    background: var(--cw-green);
-    color: #ffffff;
-    height: 48px;
-    min-width: 80px;
-    padding: 0 24px;
-    border-radius: var(--cw-radius-sm);
-    font-size: 16px;
-    font-weight: 500;
+    background: rgb(31, 146, 84);
+    color: rgb(255, 255, 255);
+    border-width: medium;
+    border-style: none;
+    border-color: currentcolor;
+    border-image: none;
+    border-radius: 999px;
+    padding: 11px 26px;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: rgba(31, 146, 84, 0.25) 0px 2px 8px;
 }
 
 .ct-wizard-btn--next:hover:not(:disabled):not(.ct-wizard-btn--disabled) {
@@ -285,13 +306,14 @@
 }
 
 .ct-wizard-btn--back {
-    background: none;
-    color: var(--cw-text);
-    height: 48px;
-    padding: 0 4px;
-    font-size: 16px;
-    font-weight: 500;
-    border-radius: var(--cw-radius-sm);
+background: rgb(255, 253, 249);
+    border: 1px solid rgb(219, 212, 199);
+    border-radius: 999px;
+    padding:11px 26px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    color: rgb(94, 87, 75);
 }
 
 .ct-wizard-btn--back:hover {
@@ -313,13 +335,13 @@
 
 /* Step heading — 30px semibold, tracking -0.75px (from Figma) */
 .ct-step__title {
-    font-size: 30px;
-    font-weight: 600;
     color: var(--cw-text);
     margin: 0 0 12px;
     line-height: 1.2;
     letter-spacing: -0.75px;
     text-align: right;
+    font-size: clamp(24px, 5.5vw, 30px);
+    font-weight: 800;
 }
 
 .ct-step__subtitle {
@@ -698,17 +720,19 @@
 
 /* Each checkbox row — pill style from Figma */
 .ct-checkbox-item {
-    display: flex;
+display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 11px;
+    border-radius: 11px;
+    padding: 11px 16px;
+    font-size: 15px;
     cursor: pointer;
-    padding: 0 13px;
-    height: 48px;
-    border: 1px solid var(--cw-border-section);
-    border-radius: var(--cw-radius);
-    transition: border-color var(--cw-transition), background var(--cw-transition);
-    user-select: none;
-    background: #ffffff;
+    background: rgb(255, 253, 249);
+    text-align: right;
+    width: 100%;
+    color: rgb(43, 38, 34);
+    transition: border-color 0.12s;
+    border: 1px solid rgb(219, 212, 199);
 }
 
 .ct-checkbox-item:hover {
@@ -716,8 +740,7 @@
 }
 
 .ct-checkbox-item:has(input:checked) {
-    border-color: var(--cw-green);
-    background: var(--cw-green-light);
+    border-color: rgb(31, 146, 84);
 }
 
 /* Validation error flare for a checkbox row (e.g. unaccepted terms on the
@@ -733,8 +756,8 @@
 
 /* Figma checkbox: 20px square, 4px radius, 2px border */
 .ct-checkbox-item input[type="checkbox"] {
-    width: 20px;
-    height: 20px;
+    width: 18px;
+    height: 18px;
     border: 2px solid var(--cw-border-idle);
     border-radius: 4px;
     background: #ffffff;
@@ -746,19 +769,20 @@
 }
 
 .ct-checkbox-item input[type="radio"] {
-    width: 20px;
-    height: 20px;
+    width: 18px;
+    height: 18px;
     flex-shrink: 0;
     accent-color: var(--cw-green);
     appearance: auto;
     order: -1;
     cursor: pointer;
+        margin: 0;
 }
 
 .ct-checkbox-item__label {
-    font-size: 15px;
-    font-weight: 500;
-    color: var(--cw-text);
+font-size: 15px;
+    font-weight: normal;
+    color: rgb(43, 38, 34);
     flex: 1;
     text-align: right;
 }
@@ -793,13 +817,13 @@
 
 /* Upload zone — Figma: 2px dashed #d1d5db, 16px border-radius */
 .ct-upload-zone {
-    border: 2px dashed var(--cw-border-idle);
-    border-radius: var(--cw-radius-lg);
+    border: 1px dashed var(--cw-border-idle);
+    border-radius: var(--cw-radius);
     padding: 50px 50px;
     text-align: center;
     cursor: pointer;
     transition: border-color var(--cw-transition), background var(--cw-transition);
-    background: #ffffff;
+    background: rgb(251, 248, 241);
     position: relative;
     min-height: 180px;
     display: flex;
@@ -1115,7 +1139,7 @@ body.ct-modal-open {
     display: flex;
     flex-direction: row;
     align-items: center;
-    gap: 48px;
+    gap: 40px;
     min-height: calc(100vh - var(--cw-header-h) - var(--cw-footer-h) - 64px);
     padding: 32px 0;
 }
@@ -1133,6 +1157,8 @@ body.ct-modal-open {
     border-radius: var(--cw-radius-lg);
     display: block;
     background: var(--cw-border-idle);
+    object-position: center 72%;
+    height: 331px;
 }
 
 /* Text column — RIGHT side */
@@ -1140,7 +1166,7 @@ body.ct-modal-open {
     flex: 1;
     display: flex;
     flex-direction: column;
-    gap: 20px;
+    gap: 0;
     text-align: right;
 }
 
@@ -1152,12 +1178,13 @@ body.ct-modal-open {
 }
 
 .ct-intro-screen__title {
-    font-size: 44px;
-    font-weight: 600;
     color: var(--cw-text);
-    line-height: 1.15;
-    letter-spacing: -1.1px;
-    margin: 0;
+margin: 0px 0px 14px;
+    font-size: clamp(28px, 6.5vw, 40px);
+    font-weight: 800;
+    line-height: 1.2;
+    letter-spacing: -0.4px;
+
 }
 
 .ct-intro-screen__subtitle {
@@ -1199,9 +1226,12 @@ body.ct-modal-open {
 
 /* Intro-1: dark step label */
 .ct-intro-screen--1 .ct-intro-screen__step-label {
-    font-size: 13px;
-    color: var(--cw-text);
-    letter-spacing: 0.325px;
+display: block;
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: 0.4px;
+    color: rgb(31, 146, 84);
+    margin-bottom: 12px;
 }
 
 /* Intro-2: larger title + subtitle */
@@ -1788,112 +1818,199 @@ body:has(#ct-wizard-container.ct-wizard-inline) {
 }
 
 /* ============================================================================
-   Landing step — "All Phases Overview" (Figma node 1272:803)
-   Two-column: phases list LEFT, title RIGHT (RTL)
+   Landing step — all phases overview
    ============================================================================ */
+
+#ct-wizard-step-content:has(.ct-wizard-landing) {
+    max-width: 1000px;
+    padding-inline: 24px;
+}
+
+#ct-wizard-step-content:has(.ct-step){
+    max-width: 680px;
+
+}
+
+.ct-wizard-landing__resume-notice {
+    max-width: 952px;
+    margin: 20px auto 0;
+    padding: 12px 16px;
+    font-size: 14px;
+}
+
+.ct-wizard-landing__resume-link {
+    color: var(--cw-green);
+    font-weight: 600;
+    margin-inline-start: 8px;
+}
 
 .ct-wizard-landing {
     display: flex;
-    flex-direction: row;
+    flex-wrap: wrap;
     align-items: center;
-    gap: 48px;
-    min-height: calc(100vh - var(--cw-header-h) - var(--cw-footer-h) - 64px);
-    padding: 32px 0;
+    gap: clamp(32px, 6vw, 72px);
+    padding: 48px 0 40px;
 }
 
-/* Title column — RIGHT side in RTL (first in DOM = right) */
 .ct-wizard-landing__title-col {
-    flex: 0 0 44%;
+    flex: 1 1 340px;
+    min-width: 280px;
     text-align: right;
 }
 
-.ct-wizard-landing__title {
-    font-size: 40px;
-    font-weight: 600;
-    color: var(--cw-text);
-    line-height: 1.2;
-    letter-spacing: -1px;
-    margin: 0;
+.ct-wizard-landing__eyebrow {
+    display: block;
+    margin-bottom: 12px;
+    color: #1f9254;
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: 0.4px;
 }
 
-/* Phases list — LEFT side */
+.ct-wizard-landing__title {
+    margin: 0;
+    color: #2b2622;
+    font-size: clamp(28px, 6.5vw, 40px);
+    font-weight: 800;
+    line-height: 1.2;
+    letter-spacing: -0.4px;
+    text-wrap: balance;
+}
+
+.ct-wizard-landing__plan-note {
+    margin: 16px 0 0;
+    color: #8a8175;
+    font-size: 14px;
+}
+
 .ct-wizard-landing__phases-col {
-    flex: 1;
+    flex: 1 1 340px;
+    min-width: 280px;
     display: flex;
     flex-direction: column;
+    margin: 0;
+    padding: 0;
+    list-style: none;
 }
 
-/*
- * Phase row: DOM order = [number][texts][icon]
- * In RTL flex: number → RIGHT, texts → MIDDLE, icon → LEFT
- * (matches Figma 1272:803 screenshot)
- */
 .ct-wizard-landing__phase {
+    position: relative;
     display: flex;
-    align-items: center;
-    gap: 16px;
-    padding: 28px 0;
-    border-bottom: 1px solid var(--cw-border-section);
+    gap: 14px;
+    padding: 22px 0;
 }
 
 .ct-wizard-landing__phase:first-child {
-    border-top: 1px solid var(--cw-border-section);
+    padding-top: 4px;
+}
+
+.ct-wizard-landing__phase:last-child {
+    padding-bottom: 4px;
+}
+
+.ct-wizard-landing__phase:not(:last-child)::after {
+    content: '';
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    left: 110px;
+    height: 1px;
+    background: #efe9dc;
 }
 
 .ct-wizard-landing__phase-num {
     font-size: 16px;
-    color: var(--cw-text);
+    color: #8a8175;
     flex-shrink: 0;
-    line-height: 1.75;
-    /* First in DOM → visual RIGHT in RTL flex */
+    align-self: flex-start;
+    padding-top: 1px;
 }
 
 .ct-wizard-landing__phase-texts {
     text-align: right;
-    flex: 1; /* fills the middle space */
+    flex: 1;
 }
 
 .ct-wizard-landing__phase-title {
-    font-size: 16px;
-    font-weight: 600;
-    color: var(--cw-text);
     margin: 0 0 4px;
-    line-height: 1.5;
+    color: #2b2622;
+    font-size: 17px;
+    font-weight: 700;
+    line-height: 1.4;
 }
 
 .ct-wizard-landing__phase-desc {
-    font-size: 15px;
-    color: var(--cw-text-muted);
     margin: 0;
-    line-height: 1.6;
+    color: #8a8175;
+    font-size: 14.5px;
+    line-height: 1.55;
 }
 
-/* Phase icon square — 72×72px green rounded, last in DOM → LEFT in RTL flex */
-.ct-wizard-landing__phase-icon {
-    width: 72px;
-    height: 72px;
-    background: var(--cw-green-light);
-    border-radius: var(--cw-radius);
+.ct-wizard-landing__phase-media {
+    width: 88px;
+    height: 88px;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 28px;
     flex-shrink: 0;
+    overflow: hidden;
+    border: 1px solid #e4dccd;
+    border-radius: 20px;
+    background: #f6f1e7;
+    font-size: 30px;
 }
 
-/* Mobile stacked layout */
+.ct-wizard-landing__phase-media img {
+    width: 100%;
+    height: 100%;
+    display: block;
+    object-fit: cover;
+}
+
 @media (max-width: 720px) {
+    #ct-wizard-step-content:has(.ct-wizard-landing) {
+        padding-inline: 16px;
+    }
+
     .ct-wizard-landing {
         flex-direction: column;
         gap: 24px;
         min-height: auto;
+        padding: 28px 0 24px;
     }
+
     .ct-wizard-landing__title-col {
         flex: none;
         width: 100%;
     }
-    .ct-wizard-landing__title {
-        font-size: 30px;
+
+    .ct-wizard-landing__phases-col {
+        flex: none;
+        width: 100%;
+    }
+}
+
+@media (max-width: 480px) {
+    .ct-wizard-landing__phase {
+        gap: 10px;
+    }
+
+    .ct-wizard-landing__phase-media {
+        width: 72px;
+        height: 72px;
+        border-radius: 16px;
+    }
+
+    .ct-wizard-landing__phase:not(:last-child)::after {
+        left: 88px;
+    }
+
+    .ct-wizard-landing__phase-title {
+        font-size: 16px;
+    }
+
+    .ct-wizard-landing__phase-desc {
+        font-size: 13.5px;
     }
 }
 

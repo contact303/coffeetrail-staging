@@ -83,6 +83,7 @@ $is_landing = $current_step === 'landing';
 				id="ct-help-trigger"
 				aria-label="שאלות ועזרה"
 				<?php if ( $is_landing ) : ?>style="display:none;"<?php endif ?>>
+					<svg data-dc-tpl="39" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle data-dc-tpl="40" cx="12" cy="12" r="9"></circle><path data-dc-tpl="41" d="M9.2 9a2.8 2.8 0 0 1 5.4 1c0 1.8-2.6 2.5-2.6 2.5"></path><path data-dc-tpl="42" d="M12 17.5h.01"></path></svg>
 				שאלות?
 			</button>
 

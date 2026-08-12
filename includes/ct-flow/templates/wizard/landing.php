@@ -20,67 +20,69 @@ if ( ! defined( 'ABSPATH' ) ) {
 $add_listing_url = home_url( '/add-listing/' );
 ?>
 
-<?php if ( ! empty( $has_draft ) ) : ?>
-	<div class="ct-info-box ct-info-box--green" style="margin:0 0 20px;padding:12px 16px;background:var(--cw-green-bg);border-radius:10px;font-size:14px;">
+<?php //if ( ! empty( $has_draft ) ) : ?>
+	<!--<div class="ct-info-box ct-info-box--green ct-wizard-landing__resume-notice" role="status">
 		<strong>יש לכם רישום שלא הושלם.</strong>
 		<a href="<?php echo esc_url( add_query_arg( 'ct_resume', '1', $add_listing_url ) ) ?>"
-			style="color:var(--cw-green);font-weight:600;margin-right:8px;">
+			class="ct-wizard-landing__resume-link">
 			המשיכו מאיפה שעצרתם ←
 		</a>
-	</div>
-<?php endif ?>
+	</div>-->
+<?php //endif ?>
 
-<div class="ct-wizard-landing">
+<section class="ct-wizard-landing" aria-labelledby="ct-wizard-landing-title">
 
-	<!-- ── Title column (RIGHT in RTL, first in DOM) ── -->
 	<div class="ct-wizard-landing__title-col">
-		<h1 class="ct-wizard-landing__title">
+		<span class="ct-wizard-landing__eyebrow">בואו נתחיל</span>
+		<h1 id="ct-wizard-landing-title" class="ct-wizard-landing__title">
 			לעלות עגלה לקופיטרייל זה עניין של כמה דקות
 		</h1>
-		<?php if ( $listing_package === 'pro' ) : ?>
-			<p style="margin-top:16px;font-size:14px;color:var(--cw-text-muted);">
-				נבחר מסלול <strong>PRO</strong> — תשלום יבוצע בסוף התהליך.
-			</p>
-		<?php endif ?>
 	</div>
 
-	<!-- ── Phases list (LEFT in RTL) ── -->
-	<div class="ct-wizard-landing__phases-col">
+	<ol class="ct-wizard-landing__phases-col" aria-label="שלבי העלאת העגלה">
+		<li class="ct-wizard-landing__phase">
+			<span class="ct-wizard-landing__phase-num" aria-hidden="true">1</span>
+			<div class="ct-wizard-landing__phase-texts">
+				<h2 class="ct-wizard-landing__phase-title">ספרו לנו על העגלה שלכם</h2>
+				<p class="ct-wizard-landing__phase-desc">מוסיפים מיקום ופרטים בסיסיים ואתם כבר מופיעים.</p>
+			</div>
+			<div class="ct-wizard-landing__phase-media" aria-hidden="true">
+				<img src="<?php echo get_stylesheet_directory_uri() ?>/includes/ct-flow/assets/images/drinks.jpeg"
+					alt="ספרו לנו על העגלה שלכם"
+					width="86"
+					height="86">
+			</div>
+		</li>
 
-	<!--
-		DOM order per RTL flex: number (RIGHT) → texts (MIDDLE) → icon (LEFT).
-		Figma 1272:803: [icon left] [text middle] [number right].
-	-->
-	<div class="ct-wizard-landing__phase">
-		<span class="ct-wizard-landing__phase-num">1</span>
-		<div class="ct-wizard-landing__phase-texts">
-			<h3 class="ct-wizard-landing__phase-title">ספרו לנו על העגלה שלכם</h3>
-			<p class="ct-wizard-landing__phase-desc">מוסיפים מיקום ופרטים בסיסיים ואתם כבר מופיעים</p>
-		</div>
-		<div class="ct-wizard-landing__phase-icon">📍</div>
-	</div>
+		<li class="ct-wizard-landing__phase">
+			<span class="ct-wizard-landing__phase-num" aria-hidden="true">2</span>
+			<div class="ct-wizard-landing__phase-texts">
+				<h2 class="ct-wizard-landing__phase-title">משדרגים את העמוד שלכם</h2>
+				<p class="ct-wizard-landing__phase-desc">מוסיפים תמונות, תפריט ופרטים שיעזרו ללקוחות למצוא אתכם בקלות.</p>
+			</div>
+			<div class="ct-wizard-landing__phase-media" aria-hidden="true">
+				<img src="<?php echo get_stylesheet_directory_uri() ?>/includes/ct-flow/assets/images/food.png"
+					alt="משדרגים את העמוד שלכם"
+					width="86"
+					height="86">
+			</div>
+		</li>
 
-	<div class="ct-wizard-landing__phase">
-		<span class="ct-wizard-landing__phase-num">2</span>
-		<div class="ct-wizard-landing__phase-texts">
-			<h3 class="ct-wizard-landing__phase-title">משדרגים את העמוד שלכם</h3>
-			<p class="ct-wizard-landing__phase-desc">מוסיפים תמונות, תפריט ופרטים שיעזרו ללקוחות למצוא אתכם בקלות</p>
-		</div>
-		<div class="ct-wizard-landing__phase-icon">✨</div>
-	</div>
-
-	<div class="ct-wizard-landing__phase">
-		<span class="ct-wizard-landing__phase-num">3</span>
-		<div class="ct-wizard-landing__phase-texts">
-			<h3 class="ct-wizard-landing__phase-title">מסיימים ומשדרגים חשיפה</h3>
-			<p class="ct-wizard-landing__phase-desc">מגדירים שעות ומתחילים לקבל לקוחות</p>
-		</div>
-		<div class="ct-wizard-landing__phase-icon">🚀</div>
-	</div>
-
-	</div>
-
-</div>
+		<li class="ct-wizard-landing__phase">
+			<span class="ct-wizard-landing__phase-num" aria-hidden="true">3</span>
+			<div class="ct-wizard-landing__phase-texts">
+				<h2 class="ct-wizard-landing__phase-title">מסיימים ומשדרגים חשיפה</h2>
+				<p class="ct-wizard-landing__phase-desc">מגדירים שעות ומתחילים לקבל לקוחות.</p>
+			</div>
+			<div class="ct-wizard-landing__phase-media" aria-hidden="true">
+				<img src="<?php echo get_stylesheet_directory_uri() ?>/includes/ct-flow/assets/images/map.png"
+					alt="מסיימים ומשדרגים חשיפה"
+					width="86"
+					height="86">
+			</div>
+		</li>
+	</ol>
+</section>
 
 <?php
 // Footer: "מתחילים" button only, no back button on first step.
