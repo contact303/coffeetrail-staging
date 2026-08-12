@@ -81,7 +81,7 @@
 
 #ct-wizard-step-content {
     flex: 1;
-    padding: 32px 24px calc(var(--cw-footer-h) + 32px);
+    padding: 50px 24px calc(var(--cw-footer-h) + 32px);
     max-width: 920px;
     width: 100%;
     margin: 0 auto;
@@ -122,13 +122,15 @@
     height: 48px;
     display: flex;
     align-items: center;
-    justify-content: center;
+    justify-content: flex-start;
     flex-shrink: 0;
     overflow: hidden;
+    flex: 1 1 0;
+    min-width: 0;
 }
 
 .ct-wizard-header__logo-badge img {
-    width: 100%;
+    width: 48px;
     display: block;
 }
 
@@ -149,6 +151,8 @@
     align-items: center;
     gap: 16px;
         flex-direction: row-reverse;
+        flex: 1 1 0;
+    min-width: 0;
 }
 
 .ct-wizard-header__save-exit-btn {
@@ -204,13 +208,14 @@ display: inline-flex;
     justify-content: center;
     gap: 12px;
     padding: 10px 24px 14px;
+    flex: 1 1 0;
+    min-width: 0;
 }
 
 .ct-wizard-group-indicator__label {
-    flex-shrink: 0;
-    color: var(--cw-text-muted);
-    font-size: 13px;
-    font-weight: 600;
+    font-size: 12px;
+    font-weight: 700;
+    color: rgb(138, 129, 117);
     white-space: nowrap;
 }
 
@@ -223,11 +228,11 @@ display: inline-flex;
 }
 
 .ct-wizard-group-indicator__segment {
-    flex: 1 1 0;
     height: 4px;
     border-radius: 2px;
     background: #e5e7eb;
     transition: background 0.3s ease;
+    width: 26px;
 }
 
 .ct-wizard-group-indicator__segment.is-active {
@@ -1165,7 +1170,7 @@ body.ct-modal-open {
     align-items: center;
     gap: 40px;
     min-height: calc(100vh - var(--cw-header-h) - var(--cw-footer-h) - 64px);
-    padding: 32px 0;
+    padding: 0;
 }
 
 /* Image column — LEFT side. In RTL flex, higher order = leftmost. */
@@ -1195,10 +1200,12 @@ body.ct-modal-open {
 }
 
 .ct-intro-screen__step-label {
+display: block;
     font-size: 14px;
-    font-weight: 500;
-    color: var(--cw-text-muted);
-    letter-spacing: 0.3px;
+    font-weight: 700;
+    letter-spacing: 0.4px;
+    color: rgb(31, 146, 84);
+    margin-bottom: 12px;
 }
 
 .ct-intro-screen__title {
@@ -1212,10 +1219,10 @@ margin: 0px 0px 14px;
 }
 
 .ct-intro-screen__subtitle {
-    font-size: 17px;
-    color: var(--cw-text-secondary);
+margin: 0px 0px 22px;
+    font-size: clamp(16px, 4vw, 19px);
+    color: rgb(138, 129, 117);
     line-height: 1.6;
-    margin: 0;
 }
 
 /* Status badge (Phase 2: "אתם כבר על המפה") */
@@ -1231,19 +1238,19 @@ margin: 0px 0px 14px;
 }
 
 .ct-intro-screen__badge-title {
+    margin: 0px 0px 3px;
     font-size: 15px;
-    font-weight: 600;
-    color: #065f46;
-    margin: 0 0 4px;
-    text-align: right;
+    font-weight: 700;
+    color: rgb(26, 125, 71);
 }
 
 .ct-intro-screen__badge-body {
+text-align: right;
+    margin: 0px;
     font-size: 14px;
-    color: #059669;
+    color: rgb(58, 122, 86);
     line-height: 1.5;
-    margin: 0;
-    text-align: right;
+    padding-inline-start: 22px;
 }
 
 /* ── Per-step overrides ── */
@@ -1259,15 +1266,24 @@ display: block;
 }
 
 /* Intro-2: larger title + subtitle */
-.ct-intro-screen--2 .ct-intro-screen__title {
-    font-size: 48px;
-    letter-spacing: -1.2px;
-}
 .ct-intro-screen--2 .ct-intro-screen__subtitle {
     font-size: 18px;
 }
 .ct-intro-screen--2 .ct-intro-screen__badge {
-    padding: 12px 16px;
+   display: flex;
+    align-items: flex-start;
+    gap: 11px;
+    background: rgb(234, 243, 236);
+    border: 1px solid rgb(205, 230, 214);
+    border-radius: 14px;
+    padding: 15px 18px;
+    margin-bottom: 22px;
+    width: 100%;
+    max-width: none;
+}
+
+.ct-intro-screen.ct-intro-screen--2{
+    align-items: flex-start;
 }
 
 /* Intro-3: bold title, smaller subtitle */

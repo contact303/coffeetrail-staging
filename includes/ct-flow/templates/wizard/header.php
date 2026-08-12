@@ -48,6 +48,29 @@ $group_total = count( CT_Flow_Wizard_Controller::STEP_GROUPS );
 		</div>
 
 		<!--
+			Three-segment group indicator ("שלב N מתוך 3"). Always in the DOM (same
+			pattern as the header buttons above) so AJAX step loads can update it via
+			ct-wizard.js (updateGroupIndicator) without a full header re-render.
+			Hidden on landing/success, where get_step_group() returns null.
+		-->
+		<div class="ct-wizard-group-indicator"
+			role="progressbar"
+			aria-label="התקדמות בטופס"
+			aria-valuemin="1"
+			aria-valuemax="<?php echo esc_attr( $group_total ) ?>"
+			aria-valuenow="<?php echo esc_attr( $step_group['index'] ?? 1 ) ?>"
+			<?php if ( ! $step_group ) : ?>style="display:none;"<?php endif ?>>
+			<span class="ct-wizard-group-indicator__label">
+				<?php echo $step_group ? esc_html( sprintf( 'שלב %d מתוך %d', $step_group['index'], $step_group['total'] ) ) : '' ?>
+			</span>
+			<div class="ct-wizard-group-indicator__segments">
+				<?php for ( $i = 1; $i <= $group_total; $i++ ) : ?>
+					<span class="ct-wizard-group-indicator__segment<?php echo ( $step_group && $i <= $step_group['index'] ) ? ' is-active' : '' ?>"></span>
+				<?php endfor ?>
+			</div>
+		</div>		
+
+		<!--
 			Action buttons — LEFT side in RTL (last in DOM = flex-end = left visually).
 
 			Three buttons, always rendered, visibility toggled by PHP (initial) and
@@ -91,28 +114,5 @@ $group_total = count( CT_Flow_Wizard_Controller::STEP_GROUPS );
 
 		</div>
 
-	</div>
-
-	<!--
-		Three-segment group indicator ("שלב N מתוך 3"). Always in the DOM (same
-		pattern as the header buttons above) so AJAX step loads can update it via
-		ct-wizard.js (updateGroupIndicator) without a full header re-render.
-		Hidden on landing/success, where get_step_group() returns null.
-	-->
-	<div class="ct-wizard-group-indicator"
-		role="progressbar"
-		aria-label="התקדמות בטופס"
-		aria-valuemin="1"
-		aria-valuemax="<?php echo esc_attr( $group_total ) ?>"
-		aria-valuenow="<?php echo esc_attr( $step_group['index'] ?? 1 ) ?>"
-		<?php if ( ! $step_group ) : ?>style="display:none;"<?php endif ?>>
-		<span class="ct-wizard-group-indicator__label">
-			<?php echo $step_group ? esc_html( sprintf( 'שלב %d מתוך %d', $step_group['index'], $step_group['total'] ) ) : '' ?>
-		</span>
-		<div class="ct-wizard-group-indicator__segments">
-			<?php for ( $i = 1; $i <= $group_total; $i++ ) : ?>
-				<span class="ct-wizard-group-indicator__segment<?php echo ( $step_group && $i <= $step_group['index'] ) ? ' is-active' : '' ?>"></span>
-			<?php endfor ?>
-		</div>
 	</div>
 </header>
