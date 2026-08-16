@@ -1,6 +1,6 @@
 # CT Flow — findings detail
 
-Full risk analyses (R1–R20) for the ct-flow module, plus supplementary detail
+Full risk analyses (R1–R24) for the ct-flow module, plus supplementary detail
 relocated from `CLAUDE.md` during its split into a lean session-context file
 and this on-demand detail file. Read on demand — this file is not loaded as
 session context automatically. See `CLAUDE.md` for the architecture overview,
@@ -8,9 +8,9 @@ meta-key table, build status, path to v1, and the risk index that points here.
 
 ---
 
-## Risk register (R1–R20)
+## Risk register (R1–R24)
 
-Documented, not fixed.
+Documented, not fixed unless marked RESOLVED.
 
 **R1 — work-hours data is mangled in transit (confirmed defect).**
 `ct-wizard.js:647` builds a *flat* key `fields['day_active[sun]']`, and the hour inputs
@@ -144,8 +144,19 @@ dead "SMS registration" tab (`templates/auth/register-form.php:14-16,37`) with z
 listeners anywhere — pure UI scaffolding, not a partial backend. Needs a decision on
 which registration implementation is canonical before go-live.
 
-**R20 — `_sync_published_step()` has no case for `basics`, `location`, or
-`menu-details`; post-publish edits to those steps silently never reach native storage.**
+**R20 — RESOLVED. `_sync_published_step()` had no case for `basics`, `location`, or
+`menu-details`; post-publish edits to those steps silently never reached native storage.**
+Fixed by adding explicit `basics` and `location` cases to the switch statement
+(`class-wizard-controller.php:823-888`, current line numbers), routing to the existing
+`_save_taxonomies()` / `_save_files_native()` / `_save_location_native()` savers — no new
+saver logic was written; both cases reuse functions already shared across other step cases.
+Every other step is now enumerated explicitly (either routed to a saver or marked as
+intentionally requiring none), plus a `default` that logs via `mlog()->warn()` instead of
+silently no-oping, so a future missing case is caught immediately instead of repeating this
+defect. `menu-details` remains unresolved — see its own note below; it's a field-definition
+gap, not a wiring gap, and was explicitly kept out of this fix.
+
+The original analysis (kept for reference):
 The switch statement (`class-wizard-controller.php:756-784`) only handles `amenities`,
 `menu-categories`, `images`, `menu-upload`, `social-links`, `hours`, and `contact`. No
 `default` case either. Concretely, once a listing is public (which happens automatically
@@ -234,6 +245,42 @@ path — see R19/§source #5 in the listing_package investigation) will show a b
 in that admin column indefinitely, regardless of which tier their redirect actually sent
 them to. Independent of R19's redirect-package bug and not touched by that fix — this is
 a separate missing write, not a wrong value.
+
+**R24 — `mlog()->error()` and `mlog()->warning()` are calls to methods that don't exist;
+catch blocks that claim to degrade gracefully crash on an unrelated fatal instead.**
+`mlog()` resolves to `MyListing\Utils\Logger\Logger::instance()`
+(`my-listing/includes/util.php:9-16` → `my-listing/includes/utils/logger/logger.php:9`, parent
+theme). That class defines `info()`, `warn()`, `note()`, and a set of color-named aliases
+(`blue`/`red`/`green`/…) — it has **no `error()` method, no `warning()` method, and no
+`__call()`** to catch the gap. Calling either throws a fatal `Error: Call to undefined method`.
+
+This is not a cosmetic typo. Every one of these call sites sits inside a `catch (\Throwable $e)`
+block whose own surrounding comment explicitly claims graceful degradation — e.g.
+`class-wizard-controller.php:327-329`: *"Guard the whole persistence body: any PHP Error/
+Exception is turned into a readable JSON error instead of a bare 500 critical error page."*
+In practice, the catch block's first statement is `mlog()->error(...)`, which itself throws a
+**new, uncaught** fatal `\Error` — the original exception is caught, but the catch handler
+crashes anyway, converting an intended graceful JSON error response into a raw PHP fatal / blank
+page. This directly contradicts the comment's claimed behaviour — see CLAUDE.md's ownership-
+context rule: comments here are evidence of intent, not of behaviour.
+
+Six call sites were fixed as part of the R20 fix, since they sit directly in the code paths that
+fix touches (renamed to the real `warn()` method — `error()` has no equivalent tier in this
+Logger, so `warn()`, its highest available level, is the correct substitute; the four
+`warning()` sites are an exact intent match, just the wrong method name):
+`class-wizard-controller.php:381`, `:434`, `:912`, `:1046`, `:1072`, `:1087`.
+
+**19 call sites remain unfixed** (confirmed by direct grep, not estimated) — every one of these
+will fatal instead of logging, the next time the surrounding code hits an error condition:
+- `class-admin-panel.php:95`
+- `class-wizard-page.php:111`, `:175`
+- `class-grow-webhook.php:86`, `:93`
+- `class-grow-payment.php:249`, `:287`, `:297`, `:304`
+- `class-wizard-controller.php:371`, `:535`, `:551`, `:794`, `:918`, `:924`, `:1007`, `:1281`, `:1301`
+- `class-terms-step.php:354`
+
+Fix is mechanical (rename each call to `warn()`) but touches 6 files and is unrelated to any
+single feature — separate work item, not folded into R20's fix.
 
 ---
 

@@ -173,10 +173,11 @@ needed before go-live, not urgent pre-launch · **TECH DEBT** lower-priority cle
 | R17 | Possible package-ID inversion outside ct-flow (unverified) | TECH DEBT |
 | R18 | Selective-approval feature fully built but never wired on | DEFECT |
 | R19 | Registration has three parallel, inconsistent implementations | DEFECT |
-| R20 | `_sync_published_step()` missing cases block the edit-mode feature | DEFECT |
+| R20 | `_sync_published_step()` missing cases block the edit-mode feature | **RESOLVED** |
 | R21 | Terms acceptance shown at registration but never recorded there — no consent record at all if the wizard's `terms` step is never reached | DEFECT |
 | R22 | `$pending['redirect']` in the my-account OTP signup flow is captured and never read — dead code from an unfinished implementation | TECH DEBT |
 | R23 | `_ct_registered_plan` never written by the my-account OTP signup path — admin plan column blank for those users | DEFECT |
+| R24 | `mlog()->error()`/`mlog()->warning()` call undefined methods — catch blocks that claim to degrade gracefully crash on an uncaught fatal instead (19 call sites remain; 6 fixed alongside R20) | DEFECT |
 
 ---
 
@@ -199,7 +200,7 @@ implemented but incomplete/unverified (note says what would settle it) ·
 | File uploads | DEFECT | MIME/size validation solid (real `finfo` sniff, 3MB cap). No ownership check on `job_id` — any logged-in user can attach a file to another user's listing (R6). No orphan-attachment cleanup (NOT STARTED). |
 | Early publish (location step, both tiers) | DONE (by design) | Works as coded. Tier-blind by design (R3, documented in the code's own comment) — confirm this is an intended product decision, not an oversight, before go-live. |
 | Native field persistence — first publish (`finalize_listing`) | DONE | Syncs all steps collected so far to native taxonomies/tables at the location-step auto-publish. Duplicate meta pairs persist harmlessly (R11). |
-| Native field persistence — edits after publish (`_sync_published_step`) | **DEFECT** | Switch statement has no case for `basics`, `location`, or `menu-details` — re-saving those steps after the listing is already public writes postmeta only, never reaching the `type`/`road` taxonomies, `_job_logo` GUID, or the `mylisting_locations` table. Reachable today via the wizard's existing back-navigation. **Blocks the step-URL/edit-mode feature.** See R20. |
+| Native field persistence — edits after publish (`_sync_published_step`) | **RESOLVED** (partial) | `basics` and `location` now route to the same native savers used elsewhere (R20 fixed). `menu-details` still has no native target — separate field-definition question, deliberately left open. |
 | Free path | DONE (core flow) | Draft → early-publish → product-24 assignment traced end to end in code. Gap: no "your listing is live" email for free tier (NOT STARTED — `ct_flow/listing_submitted_free` has no email listener). |
 | PRO path | PARTIAL | Blocked today by the payment-step SDK gap; tier-trust hardening also needed before go-live (R2, package bullet in FINDINGS.md Appendix B). Refund-on-unpublish is DONE. |
 | Grow payment — server side (charge creation, webhook, refund) | DONE | `create_charge()`, webhook handler, and refund logic are implemented and internally consistent. Gaps: webhook signature verification NOT STARTED (comment claims it exists; code doesn't do it — R7); no SDK-vs-webhook race fallback (R4). |
@@ -219,7 +220,8 @@ implemented but incomplete/unverified (note says what would settle it) ·
 - Populate `ct_approval_required_fields`, or remove the selective-approval admin UI if not wanted for v1 (R18).
 - Add the missing free-tier "listing is live" email.
 - Resolve the registration situation: pick one canonical implementation, fix the duplicate `Template Name`, fix the my-account OTP module's hard-coded PRO redirect (R19).
-- Add `basics` and `location` cases to `_sync_published_step()` so post-publish edits to those steps actually reach native storage (R20) — **prerequisite for section C below**.
+- ~~Add `basics` and `location` cases to `_sync_published_step()`~~ — **done (R20)**. Section C's prerequisite is cleared.
+- Fix the remaining 19 `mlog()->error()`/`mlog()->warning()` call sites across the module so error handling actually degrades gracefully instead of fataling (R24).
 
 **B. Hardening required before go-live**
 - Server-side tier verification — stop trusting client-posted `package` for assignment.
@@ -232,6 +234,7 @@ implemented but incomplete/unverified (note says what would settle it) ·
 
 **C. Step-URL / edit-mode feature — not yet analysed**
 Out of scope for this investigation; needs its own trace once requirements are described.
-Known prerequisite already found: **R20 must be fixed first** — the feature's whole
-premise (jump to and re-save any step on a published listing) is currently broken for
-`basics`/`location` by `_sync_published_step()`'s missing cases.
+Prerequisite **R20 is now fixed** — `_sync_published_step()` has cases for `basics`/`location`,
+so the feature's premise (jump to and re-save any step on a published listing) is no longer
+blocked for those two steps. `menu-details` still has no native sync target; confirm whether
+the edit-mode feature needs one before including that step.

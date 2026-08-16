@@ -378,7 +378,7 @@ class CT_Flow_Wizard_Controller {
 			try {
 				self::_sync_published_step( $job_id, $step, $state );
 			} catch ( \Throwable $e ) {
-				mlog()->error( '[CT Wizard] _sync_published_step failed for #' . $job_id . ' step=' . $step . ': ' . $e->getMessage() );
+				mlog()->warn( '[CT Wizard] _sync_published_step failed for #' . $job_id . ' step=' . $step . ': ' . $e->getMessage() );
 			}
 		}
 
@@ -431,7 +431,7 @@ class CT_Flow_Wizard_Controller {
 		] );
 
 		} catch ( \Throwable $e ) {
-			mlog()->error(
+			mlog()->warn(
 				'[CT Wizard] ajax_save_step fatal on step "' . $step . '" job=' . ( $job_id ?? 0 )
 				. ': ' . $e->getMessage()
 				. ' @ ' . $e->getFile() . ':' . $e->getLine()
@@ -822,6 +822,19 @@ class CT_Flow_Wizard_Controller {
 	 */
 	private static function _sync_published_step( int $job_id, string $step, array $state ): void {
 		switch ( $step ) {
+			case 'basics':
+				self::_save_taxonomies( $job_id, $state );   // cart_type -> 'type'
+				self::_save_files_native( $job_id, $state ); // job_logo -> _job_logo
+				break;
+
+			case 'location':
+				$listing = \MyListing\Src\Listing::get( $job_id );
+				if ( $listing ) {
+					self::_save_location_native( $job_id, $listing, $state ); // address/lat/lng
+				}
+				self::_save_taxonomies( $job_id, $state ); // ct_roadside -> 'road'
+				break;
+
 			case 'amenities':
 			case 'menu-categories':
 				self::_save_taxonomies( $job_id, $state );
@@ -847,6 +860,31 @@ class CT_Flow_Wizard_Controller {
 			case 'contact':
 				self::_save_simple_fields( $job_id, $state );
 				break;
+
+			// Steps below intentionally require no native sync from this method:
+			//   - landing / intro-1 / intro-1-outro / intro-2 / intro-3: no data fields.
+			//   - menu-details: postmeta-only by design today — no cc field exists yet for
+			//     these values (see FINDINGS.md R20). Field-definition question, not a wiring gap.
+			//   - terms: its only native-adjacent write (_ct_terms_agreed_at) is special-cased
+			//     unconditionally in _persist_fields_to_draft(), independent of publish state.
+			//   - payment: _ct_cancellation_fee is postmeta-only; transaction/package side
+			//     effects belong to the Grow webhook, not this method.
+			//   - success: terminal step, no fields.
+			case 'landing':
+			case 'intro-1':
+			case 'intro-1-outro':
+			case 'intro-2':
+			case 'intro-3':
+			case 'menu-details':
+			case 'terms':
+			case 'payment':
+			case 'success':
+				break;
+
+			default:
+				// Surface unrecognized steps instead of silently doing nothing — this is
+				// the exact failure mode R20 was: a step falling through unnoticed.
+				mlog()->warn( '[CT Wizard] _sync_published_step: no case for step="' . $step . '" — verify whether it needs a native sync target.' );
 		}
 	}
 
@@ -871,7 +909,7 @@ class CT_Flow_Wizard_Controller {
 		$address = trim( $loc['address'] ?? '' );
 
 		if ( ! $lat || ! $lng ) {
-			mlog()->warning( '[CT Wizard] _save_location_native: missing lat/lng for listing #' . $job_id );
+			mlog()->warn( '[CT Wizard] _save_location_native: missing lat/lng for listing #' . $job_id );
 			return;
 		}
 
@@ -1005,7 +1043,7 @@ class CT_Flow_Wizard_Controller {
 			if ( $term instanceof WP_Term ) {
 				wp_set_object_terms( $job_id, [ $term->term_id ], 'type' );
 			} else {
-				mlog()->warning( '[CT Wizard] _save_taxonomies: term not found in "type" for slug=' . $cart_type_slug );
+				mlog()->warn( '[CT Wizard] _save_taxonomies: term not found in "type" for slug=' . $cart_type_slug );
 			}
 		}
 
@@ -1031,7 +1069,7 @@ class CT_Flow_Wizard_Controller {
 			if ( ! empty( $road_terms ) && ! is_wp_error( $road_terms ) ) {
 				wp_set_object_terms( $job_id, [ $road_terms[0]->term_id ], 'road' );
 			} else {
-				mlog()->warning( '[CT Wizard] _save_taxonomies: no terms found in "road" taxonomy.' );
+				mlog()->warn( '[CT Wizard] _save_taxonomies: no terms found in "road" taxonomy.' );
 			}
 		}
 
@@ -1046,7 +1084,7 @@ class CT_Flow_Wizard_Controller {
 				if ( $term instanceof WP_Term ) {
 					$term_ids[] = $term->term_id;
 				} else {
-					mlog()->warning( '[CT Wizard] _save_taxonomies: term not found in "case27_job_listing_tags" for slug=' . $slug );
+					mlog()->warn( '[CT Wizard] _save_taxonomies: term not found in "case27_job_listing_tags" for slug=' . $slug );
 				}
 			}
 			if ( ! empty( $term_ids ) ) {
