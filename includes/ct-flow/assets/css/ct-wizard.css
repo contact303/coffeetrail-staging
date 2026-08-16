@@ -1253,6 +1253,28 @@ text-align: right;
     padding-inline-start: 22px;
 }
 
+/* Free-tier exit link (intro-2 only) — plain underlined text, no button chrome,
+   sits below the subtitle/badge so it reads as a quieter secondary path next to
+   the primary "ממשיכים" footer button. */
+.ct-intro-screen__exit-link {
+    align-self: flex-start;
+    margin-top: 4px;
+    padding: 0;
+    border: 0;
+    background: none;
+    color: var(--cw-text-muted);
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 600;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+}
+
+.ct-intro-screen__exit-link:hover {
+    color: var(--cw-text);
+}
+
 /* ── Per-step overrides ── */
 
 /* Intro-1: dark step label */
@@ -1783,6 +1805,14 @@ display: block;
 .ct-success-screen__logo-emoji {
     font-size: 32px;
     line-height: 1;
+}
+
+/* Free branch only — plain logo image, per docs/design/ct-onboarding-complete-clean.html */
+.ct-success-screen__logo-image {
+    display: block;
+    width: auto;
+    height: 58px;
+    margin-bottom: 32px;
 }
 
 .ct-success-screen__title {

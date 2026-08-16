@@ -178,6 +178,28 @@ the ~13 data-bearing steps. It needs `basics` and `location` cases added (routin
 `_save_taxonomies()` / `_save_files_native()` / `_save_location_native()` as appropriate)
 before that feature can be built on top of it.
 
+**R21 — Terms acceptance is displayed at registration but never recorded there.**
+`_ct_terms_agreed_at` is written in exactly two places in the whole theme: the wizard's
+own `terms` step (`class-wizard-controller.php:709/711/1186`) and the legacy, likely-dead
+`class-terms-step.php:208` (part of the R19 parallel submit-form flow). All three
+registration entry points — `templates/page-ct-register.php`, `templates/page-ct-register-otp.php`,
+`includes/my-account/register-otp.php` — render a "בבחירת הסכמה והמשך, אני מסכים/ה ל..."
+ToS paragraph via the shared `ct_auth_tos_text()` helper, but none of their user-creation
+code writes any consent meta; only `_ct_marketing_consent`, `_ct_marketing_consent_date`,
+and `_ct_registered_plan` are saved. Registration shows the terms text but does not log
+that the user agreed to it.
+
+Until now this was latent: every user necessarily passed through the wizard's `terms`
+step to reach `success`, so a record existed by the time the flow completed even though
+it was written at the wrong point (post-submission, not at registration). **The free-tier
+exit-at-intro-2 feature makes this reachable by a real user for the first time** — a free
+user can now register, see the ToS text (unrecorded), and finish their listing via the
+intro-2 exit link without ever reaching the wizard's `terms` step, leaving zero consent
+record anywhere for that user. Not fixed as part of that feature (out of scope, decided
+separately) — flagging here since it's now a live gap, not just a latent one. Fix would be
+an explicit consent write in each registration entry point's user-creation code,
+independent of the wizard.
+
 ---
 
 ## Appendix A — Status of `CT-FLOW-DETAILED-SPEC.md`

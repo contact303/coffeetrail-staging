@@ -22,10 +22,31 @@ $upgrade_url = add_query_arg( 'listing_package', CT_FLOW_PRO_PRODUCT_ID, home_ur
 ?>
 <div class="ct-success-screen" id="ct-step-success">
 
-	<!-- Logo badge — matches Figma 64×64 black rounded square -->
-	<div class="ct-success-screen__logo">
-		<span class="ct-success-screen__logo-emoji" aria-hidden="true">☕</span>
-	</div>
+	<?php if ( $is_pro ) : ?>
+		<!-- Logo badge — matches Figma 64×64 black rounded square -->
+		<div class="ct-success-screen__logo">
+			<span class="ct-success-screen__logo-emoji" aria-hidden="true">☕</span>
+		</div>
+	<?php else :
+		// Free branch — per docs/design/ct-onboarding-complete-clean.html: plain logo
+		// image instead of the black badge. Same onerror fallback pattern as
+		// header.php's logo (swap to the badge if no logo file exists / fails to load).
+		$logo_url = CT_Flow_Wizard_Page::get_logo_url();
+	?>
+		<?php if ( $logo_url ) : ?>
+			<img src="<?php echo esc_url( $logo_url ) ?>"
+				alt="<?php echo esc_attr( get_bloginfo( 'name' ) ) ?>"
+				class="ct-success-screen__logo-image"
+				onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+			<div class="ct-success-screen__logo" style="display:none;">
+				<span class="ct-success-screen__logo-emoji" aria-hidden="true">☕</span>
+			</div>
+		<?php else : ?>
+			<div class="ct-success-screen__logo">
+				<span class="ct-success-screen__logo-emoji" aria-hidden="true">☕</span>
+			</div>
+		<?php endif ?>
+	<?php endif ?>
 
 	<!-- Headline -->
 	<h1 class="ct-success-screen__title">

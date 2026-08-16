@@ -103,6 +103,22 @@ $intro_class = 'ct-intro-screen ct-intro-screen--' . $step_num
 		<h2 class="ct-intro-screen__title"><?php echo esc_html( $intro['title'] ) ?></h2>
 		<p class="ct-intro-screen__subtitle"><?php echo esc_html( $intro['subtitle'] ) ?></p>
 
+		<?php
+		// Free-tier exit point: group 1 (basics/contact/location, already saved and
+		// published) is the complete free-tier experience; groups 2–3 beyond this
+		// screen are PRO-only content. Template-side gating only — the authoritative
+		// check is server-side in ajax_save_step() (class-wizard-controller.php),
+		// keyed off the stored session tier, not this $listing_package value.
+		if ( $current_step === 'intro-2' && $listing_package === 'free' ) : ?>
+			<button type="button"
+				class="ct-intro-screen__exit-link js-free-exit-trigger"
+				id="ct-free-exit"
+				data-action="free-exit"
+				aria-label="להישאר עם הדף החינמי ולעבור לעמוד האישי">
+				להישאר עם הדף החינמי ולעבור לעמוד האישי ←
+			</button>
+		<?php endif ?>
+
 	</div>
 
 </div>

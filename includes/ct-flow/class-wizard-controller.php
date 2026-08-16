@@ -330,6 +330,11 @@ class CT_Flow_Wizard_Controller {
 		try {
 
 		$state = self::get_state( $user_id );
+		// Authoritative tier for the free-exit gate below: the package as stored from
+		// BEFORE this request, not the value this request just posted. A crafted POST
+		// can claim package=free on a single call without that being the session's
+		// real tier — reading the pre-existing stored value closes that specific hole.
+		$stored_package = $state['listing_package'] ?? 'free';
 		$state['listing_package'] = $package;
 
 		// Merge step data into state.
@@ -378,6 +383,25 @@ class CT_Flow_Wizard_Controller {
 		}
 
 		$next = self::next_step( $step, $package );
+
+		// Free-tier early exit from intro-2: land directly on the success screen
+		// instead of continuing into amenities/images/menu/hours (PRO-only content —
+		// group 1 is the complete free-tier experience). Gated on $stored_package,
+		// not $package, so a PRO session can't reach this by posting package=free on
+		// this one call. This only closes the crafted-request case for THIS action —
+		// $stored_package itself was originally written from a client-posted `package`
+		// param on an earlier step save, so it inherits that same trust weakness (see
+		// "Server-side tier verification" in CLAUDE.md's Path to v1, §B). Does not
+		// touch _sync_published_step() or completed_steps beyond marking intro-2 done
+		// above.
+		if ( $step === 'intro-2' && $stored_package === 'free' && ! empty( $raw_fields['ct_free_exit'] ) ) {
+			$next    = 'success';
+			// Force free here too: keeps the "$next === 'success' && $package === 'free'"
+			// cleanup check below reliable even if this request's POSTed package disagreed
+			// with the confirmed-free $stored_package above.
+			$package = 'free';
+			$state['listing_package'] = 'free';
+		}
 
 		if ( $next ) {
 			$state['current_step'] = $next;

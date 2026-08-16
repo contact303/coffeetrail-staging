@@ -89,6 +89,7 @@
         bindMenuTypeToggle();
         bindFieldStates();
         bindFloatingButtonClearance();
+        bindFreeExit();
 
         // Handle Grow payment success — check the flag first (race: grow wallet fires
         // before this ready callback) then listen for the event (normal flow).
@@ -199,6 +200,20 @@
         }
 
         saveStepAndAdvance();
+    }
+
+    /**
+     * Free-tier exit link on intro-2 ("להישאר עם הדף החינמי ולעבור לעמוד האישי").
+     * No fields to validate on this step, so this skips validateCurrentStep() and
+     * goes straight to saveStepAndAdvance() with a flag the server reads to route
+     * to the success screen instead of the next PRO-content step. Delegated on
+     * document (like SEL.saveExitTrigger) so it keeps working after loadStep()
+     * replaces #ct-wizard-step-content.
+     */
+    function bindFreeExit() {
+        $(document).on('click', '.js-free-exit-trigger', function () {
+            saveStepAndAdvance({ ct_free_exit: '1' });
+        });
     }
 
     // =========================================================================
@@ -484,8 +499,12 @@
     // AJAX: Save step and load next
     // =========================================================================
 
-    function saveStepAndAdvance() {
-        const fields = collectStepFields();
+    /**
+     * @param {Object} [extraFields]  Merged on top of the fields collected from the
+     *   DOM — used by bindFreeExit() to send a flag with no corresponding form input.
+     */
+    function saveStepAndAdvance(extraFields) {
+        const fields = $.extend({}, collectStepFields(), extraFields || {});
 
         setLoading(true);
 
@@ -527,10 +546,20 @@
      * navigating away from the landing step leaves the header showing "יציאה"
      * with no "שאלות?" button.
      *
+     * success.php's own docblock says the success screen has no header bar, and
+     * header.php enforces that server-side by returning early — but that only
+     * covers a fresh full-page load. An AJAX transition into success (via the
+     * normal last-step Next click, or the free-tier exit link) never re-renders
+     * header.php, so without this the bar stays on screen. Mirror the PHP-side
+     * rule here: hide the whole bar on success, show it everywhere else (success
+     * is a terminal step — nothing currently navigates back out of it — but the
+     * explicit show() keeps this correct if that ever changes).
+     *
      * @param {string} stepKey  The step key just loaded (e.g. 'landing', 'basics').
      */
     function updateHeaderForStep(stepKey) {
         const isLanding = (stepKey === 'landing');
+        $('.ct-wizard-header').toggle(stepKey !== 'success');
         $('#ct-save-exit-main').toggle(!isLanding);
         $('#ct-exit-only').toggle(isLanding);
         $('#ct-help-trigger').toggle(!isLanding);
