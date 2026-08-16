@@ -175,6 +175,8 @@ needed before go-live, not urgent pre-launch · **TECH DEBT** lower-priority cle
 | R19 | Registration has three parallel, inconsistent implementations | DEFECT |
 | R20 | `_sync_published_step()` missing cases block the edit-mode feature | DEFECT |
 | R21 | Terms acceptance shown at registration but never recorded there — no consent record at all if the wizard's `terms` step is never reached | DEFECT |
+| R22 | `$pending['redirect']` in the my-account OTP signup flow is captured and never read — dead code from an unfinished implementation | TECH DEBT |
+| R23 | `_ct_registered_plan` never written by the my-account OTP signup path — admin plan column blank for those users | DEFECT |
 
 ---
 

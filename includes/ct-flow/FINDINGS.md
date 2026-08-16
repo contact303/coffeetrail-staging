@@ -200,6 +200,41 @@ separately) — flagging here since it's now a live gap, not just a latent one. 
 an explicit consent write in each registration entry point's user-creation code,
 independent of the wizard.
 
+**R22 — `$pending['redirect']` in the my-account OTP signup flow is dead code.**
+`includes/my-account/register-otp.php:652` captures the original `redirect` URL (posted
+from the hidden field in `templates/auth/register-otp.php:190-191`) into the OTP
+transient's `$pending` array at the `request_otp` stage. It is never read again: a
+whole-file grep for `$pending['redirect']` returns exactly this one write, and the
+completion block builds its own unrelated post-registration redirect from scratch
+(`register-otp.php:519-526` — the line R19 already flagged for hard-coding PRO; since
+fixed to emit `CT_FLOW_FREE_PRODUCT_ID` instead, per product decision that every signup
+starts free). No other
+file can be reading it either — the transient key is namespaced via the file-local
+`ct_register_get_otp_key()`, and `templates/page-ct-register-otp.php` defines an
+identically-named helper but is a separate page template never loaded on the same
+request. Looks like the remnant of an unfinished implementation that was meant to route
+the user back to wherever they were trying to go (or read their original plan choice)
+after verifying the OTP, but the completion branch was written to ignore it. Believed safe
+to remove — no generic iteration over `$pending`'s keys exists in the file that would
+break if the key disappeared — but not verified against a live run, and left in place
+pending a decision on whether it should instead be *wired up* rather than deleted (see
+open question in R23).
+
+**R23 — `_ct_registered_plan` is never written by the live my-account OTP signup path,
+so the admin plan column is blank for every user who signs up that way.**
+`includes/my-account/register-otp.php`'s registration-completion block (`:455-544`)
+writes only `_ct_marketing_consent` and `_ct_marketing_consent_date` on the new user; it
+never writes `_ct_registered_plan`. That meta key is written elsewhere —
+`class-registration-hooks.php:283` (dead code, unhooked — see R14/R19) and
+`page-ct-register.php:109` / `page-ct-register-otp.php:257` (both live, both write it
+correctly). `templates/admin/moderation-panel.php:81` reads `_ct_registered_plan` to
+display a user's registered plan in the admin UI, with no fallback for a missing value.
+Net effect: any user who registers through the my-account OTP form (a live, reachable
+path — see R19/§source #5 in the listing_package investigation) will show a blank plan
+in that admin column indefinitely, regardless of which tier their redirect actually sent
+them to. Independent of R19's redirect-package bug and not touched by that fix — this is
+a separate missing write, not a wrong value.
+
 ---
 
 ## Appendix A — Status of `CT-FLOW-DETAILED-SPEC.md`

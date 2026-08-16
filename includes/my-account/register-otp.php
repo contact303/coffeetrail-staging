@@ -514,12 +514,13 @@ function ct_process_account_registration() {
     wc_set_customer_auth_cookie( $new_customer_id );
 
     /**
-     * אחרי הרשמה תמיד עוברים ליצירת עגלת PRO.
+     * אין בחירת מסלול לפני ההרשמה — כל הרשמה חדשה מתחילה במסלול החינמי.
+     * שדרוג ל-PRO מתבצע בתוך האשף עצמו, במסך intro-2.
      */
     $redirect = add_query_arg(
         [
             'listing_type'    => 'cc',
-            'listing_package' => 25,
+            'listing_package' => CT_FLOW_FREE_PRODUCT_ID,
             'skip_selection'  => 1,
         ],
         home_url( '/add-listing/' )

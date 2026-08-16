@@ -1257,18 +1257,18 @@ text-align: right;
    sits below the subtitle/badge so it reads as a quieter secondary path next to
    the primary "ממשיכים" footer button. */
 .ct-intro-screen__exit-link {
-    align-self: flex-start;
-    margin-top: 4px;
-    padding: 0;
-    border: 0;
-    background: none;
-    color: var(--cw-text-muted);
+background: none;
+    border-width: medium;
+    border-style: none;
+    border-color: currentcolor;
+    border-image: none;
     cursor: pointer;
-    font-family: inherit;
-    font-size: 14px;
-    font-weight: 600;
-    text-decoration: underline;
-    text-underline-offset: 3px;
+    color: rgb(31, 146, 84);
+    font-weight: 700;
+    font-size: 15px;
+    padding: 0px;
+    text-decoration: none;
+    text-align: right;
 }
 
 .ct-intro-screen__exit-link:hover {
