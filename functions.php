@@ -887,6 +887,7 @@ add_action('wp_footer', function () {
     if (!is_page(268)) {
         return;
     }
+    return;
     ?>
     <script>
         // Disable the "nearby" option in the orderby filter if location services are denied.
