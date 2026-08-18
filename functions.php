@@ -882,3 +882,291 @@ add_filter('wpseo_schema_graph', function ($graph, $context) {
 
     return $graph;
 }, 99, 2);
+
+add_action('wp_footer', function () {
+    if (!is_page(268)) {
+        return;
+    }
+    ?>
+    <script>
+        // Disable the "nearby" option in the orderby filter if location services are denied.
+        jQuery(function ($) {
+            const selectSelector = '.orderby-filter select';
+                const nearbyValue = 'nearby';
+
+                // גלובלי לצורך בדיקה ב-Console
+                window.ctNearbyDisabled = false;
+
+                let locationMessageShown = false;
+                let locationMessageTimer = null;
+
+                function updateLocationMessage(disabled) {
+                    const $containers = $(
+                        '.mobile-explore-head-top .explore-head-search'
+                    );
+
+                    if (!disabled) {
+                        clearTimeout(locationMessageTimer);
+
+                        $('.location-services-message').remove();
+
+                        locationMessageShown = false;
+                        return;
+                    }
+
+                    // הצגת הבועה פעם אחת בלבד בכל טעינת עמוד
+                    if (locationMessageShown) {
+                        return;
+                    }
+
+                    locationMessageShown = true;
+
+                    $containers.each(function () {
+                        const $container = $(this);
+
+                        if (
+                            $container.find('.location-services-message').length
+                        ) {
+                            return;
+                        }
+
+                        const $message = $(
+                            '<div class="location-services-message" role="status">' +
+                                'שירותי המיקום כבויים אצלך, יש לחפש עגלה לפי אזור' +
+                            '</div>'
+                        );
+
+                        $container.append($message);
+
+                        requestAnimationFrame(function () {
+                            $message.addClass('is-visible');
+                        });
+                    });
+
+                    locationMessageTimer = setTimeout(function () {
+                        $('.location-services-message')
+                            .removeClass('is-visible')
+                            .addClass('is-hiding');
+
+                        setTimeout(function () {
+                            $('.location-services-message').remove();
+                        }, 300);
+                    }, 4500);
+                }
+
+                function updateSelect2Result() {
+                    const $results = $(
+                        '.select2-results__option[id$="-nearby"]'
+                    );
+
+                    if (!$results.length) {
+                        return false;
+                    }
+
+                    $results.each(function () {
+                        const $result = $(this);
+
+                        if (window.ctNearbyDisabled) {
+                            $result
+                                .attr('aria-disabled', 'true')
+                                .attr('aria-selected', 'false')
+                                .addClass(
+                                    'select2-results__option--disabled ' +
+                                    'location-option-disabled'
+                                );
+                        } else {
+                            $result
+                                .removeAttr('aria-disabled')
+                                .removeClass(
+                                    'select2-results__option--disabled ' +
+                                    'location-option-disabled'
+                                );
+                        }
+                    });
+
+                    return true;
+                }
+
+                function updateNearbyOption(disabled) {
+                    window.ctNearbyDisabled = disabled;
+
+                    updateLocationMessage(disabled);
+
+                    $(selectSelector).each(function () {
+                        const $select = $(this);
+                        const $option = $select.find(
+                            'option[value="' + nearbyValue + '"]'
+                        );
+
+                        if (!$option.length) {
+                            return;
+                        }
+
+                        // השבתת ה-option המקורי
+                        $option.prop('disabled', disabled);
+
+                        // אם nearby כבר נבחר והמיקום נחסם
+                        if (
+                            disabled &&
+                            String($select.val()) === nearbyValue
+                        ) {
+                            const fallbackValue = $select
+                                .find('option:not(:disabled)')
+                                .first()
+                                .val();
+
+                            $select
+                                .val(fallbackValue)
+                                .trigger('change');
+                        } else {
+                            $select.trigger('change.select2');
+                        }
+                    });
+
+                    updateSelect2Result();
+                }
+
+                function checkLocationPermission() {
+                    if (
+                        !window.isSecureContext ||
+                        !navigator.geolocation
+                    ) {
+                        updateNearbyOption(true);
+                        return;
+                    }
+
+                    if (
+                        !navigator.permissions ||
+                        !navigator.permissions.query
+                    ) {
+                        updateNearbyOption(false);
+                        return;
+                    }
+
+                    navigator.permissions
+                        .query({ name: 'geolocation' })
+                        .then(function (permission) {
+                            updateNearbyOption(
+                                permission.state === 'denied'
+                            );
+
+                            permission.addEventListener(
+                                'change',
+                                function () {
+                                    updateNearbyOption(
+                                        permission.state === 'denied'
+                                    );
+                                }
+                            );
+                        })
+                        .catch(function () {
+                            updateNearbyOption(false);
+                        });
+                }
+
+                /*
+                * Select2 בונה את תוצאות החיפוש רק אחרי הפתיחה.
+                * ה-Observer מזהה את ה-li ברגע שהוא נוסף ל-DOM.
+                */
+                const select2Observer = new MutationObserver(function (
+                    mutations
+                ) {
+                    let shouldUpdate = false;
+
+                    mutations.forEach(function (mutation) {
+                        mutation.addedNodes.forEach(function (node) {
+                            if (node.nodeType !== 1) {
+                                return;
+                            }
+
+                            if (
+                                node.matches?.(
+                                    '.select2-results__option[id$="-nearby"]'
+                                ) ||
+                                node.querySelector?.(
+                                    '.select2-results__option[id$="-nearby"]'
+                                )
+                            ) {
+                                shouldUpdate = true;
+                            }
+                        });
+                    });
+
+                    if (shouldUpdate) {
+                        updateSelect2Result();
+                    }
+                });
+
+                select2Observer.observe(document.body, {
+                    childList: true,
+                    subtree: true
+                });
+
+                /*
+                * טיפול נוסף מיד לאחר פתיחת Select2.
+                */
+                $(document).on(
+                    'select2:open',
+                    selectSelector,
+                    function () {
+                        requestAnimationFrame(function () {
+                            updateSelect2Result();
+                        });
+
+                        setTimeout(updateSelect2Result, 50);
+                        setTimeout(updateSelect2Result, 150);
+                    }
+                );
+
+                /*
+                * חסימת הבחירה דרך Select2.
+                */
+                $(document).on(
+                    'select2:selecting',
+                    selectSelector,
+                    function (event) {
+                        const data =
+                            event.params?.args?.data ||
+                            event.params?.data;
+
+                        if (
+                            window.ctNearbyDisabled &&
+                            String(data?.id) === nearbyValue
+                        ) {
+                            event.preventDefault();
+                        }
+                    }
+                );
+
+                /*
+                * חסימת לחיצה ישירה על ה-li.
+                */
+                $(document).on(
+                    'mousedown click',
+                    '.select2-results__option[id$="-nearby"]',
+                    function (event) {
+                        if (!window.ctNearbyDisabled) {
+                            return;
+                        }
+
+                        event.preventDefault();
+                        event.stopImmediatePropagation();
+
+                        return false;
+                    }
+                );
+
+                /*
+                * תמיכה בפילטרים שנבנים מחדש ב-AJAX.
+                */
+                $(document).ajaxComplete(function () {
+                    updateNearbyOption(
+                        window.ctNearbyDisabled
+                    );
+                });
+
+                checkLocationPermission();
+        });
+    </script>
+    <?php
+}, 100);
