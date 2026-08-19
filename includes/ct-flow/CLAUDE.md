@@ -178,6 +178,7 @@ needed before go-live, not urgent pre-launch · **TECH DEBT** lower-priority cle
 | R22 | `$pending['redirect']` in the my-account OTP signup flow is captured and never read — dead code from an unfinished implementation | TECH DEBT |
 | R23 | `_ct_registered_plan` never written by the my-account OTP signup path — admin plan column blank for those users | DEFECT |
 | R24 | `mlog()->error()`/`mlog()->warning()` call undefined methods — catch blocks that claim to degrade gracefully crash on an uncaught fatal instead (19 call sites remain; 6 fixed alongside R20) | DEFECT |
+| R25 | `region` taxonomy is never assigned to cc listings — not by ct-flow, not natively; region filter/search/Explore archives are empty for this type, proximity search unaffected | OPEN BUILD ITEM |
 
 ---
 
@@ -222,6 +223,7 @@ implemented but incomplete/unverified (note says what would settle it) ·
 - Resolve the registration situation: pick one canonical implementation, fix the duplicate `Template Name`, fix the my-account OTP module's hard-coded PRO redirect (R19).
 - ~~Add `basics` and `location` cases to `_sync_published_step()`~~ — **done (R20)**. Section C's prerequisite is cleared.
 - Fix the remaining 19 `mlog()->error()`/`mlog()->warning()` call sites across the module so error handling actually degrades gracefully instead of fataling (R24).
+- Decide whether `cc` listings need the `region` taxonomy (search filter, quick search, `/explore/regions/...`) and, if so, add a region step/field to the wizard — no assignment path exists today, native or ct-flow (R25).
 
 **B. Hardening required before go-live**
 - Server-side tier verification — stop trusting client-posted `package` for assignment.

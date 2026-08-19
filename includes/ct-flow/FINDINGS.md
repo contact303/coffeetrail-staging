@@ -282,6 +282,51 @@ will fatal instead of logging, the next time the surrounding code hits an error 
 Fix is mechanical (rename each call to `warn()`) but touches 6 files and is unrelated to any
 single feature — separate work item, not folded into R20's fix.
 
+**R25 — `region` taxonomy is never assigned to cc listings [OPEN BUILD ITEM, not a defect].**
+Checked three layers: ct-flow, the parent theme's native handling, and the child theme
+outside ct-flow.
+
+ct-flow never writes `region` — confirmed by tracing every call site of
+`_save_taxonomies()` and `_save_location_native()` (`class-wizard-controller.php:1034`,
+`:904`). `_save_taxonomies()` only maps `cart_type→type`, `ct_roadside→road`,
+`amenities→case27_job_listing_tags`, `menu_categories→foodtype`; `_save_location_native()`
+only injects `$_POST['job_location']` into `Location_Field::update()`, which itself writes
+only the `mylisting_locations` table plus `_latitude`/`_longitude`/`_location_coffee`
+postmeta. A repo-wide grep for `region` inside `includes/ct-flow/` returns zero matches.
+
+This is not a gap in an otherwise-automatic pipeline — there is nothing to have missed.
+`region` is a native MyListing taxonomy (`my-listing/includes/post-types.php:212`,
+hierarchical) exposed as an ordinary **manually-picked** field: the default field preset
+`'region'` (`my-listing/includes/src/listing-types/default-config.php:67-75`) is a
+`Term_Select_Field` whose `update()` (`term-select-field.php:118`) calls
+`wp_set_object_terms()` on whatever the user checked in `$_POST['region']`. None of the
+parent theme's geocoder classes (`my-listing/includes/src/geocoder/*.php`) or
+`Location_Field::update()` (`location-field.php:87`) derive a region term from an address
+or lat/lng — there is no geocoding-to-region logic anywhere in the theme for ct-flow's
+`$_POST`-injection trick to have bypassed. ct-flow's location step could in principle
+inject `$_POST['region']` and call that field's `update()` the same way it does for
+`job_location`, but nothing does.
+
+The child theme's only other `region`-related code
+(`functions.php:805-829`, `assets/js/ct-region-results-radius.js`) enqueues a
+results-radius overlay on the Explore map that *reads* an already-active region filter —
+it has no write path either.
+
+**What breaks as a result:** for every `cc` listing, the region `tax_query` filter in
+listing search (`my-listing/includes/src/queries/listing-feed.php:113-120`), the
+"Regions" quick-search section (`quick-search.php:125-131`), and the `/explore/regions/...`
+archive pages (`explore.php:192-198,328-348,386-391`) all return empty — silently, no
+errors. `match_by_region` on similar-listings (off by default) would exclude everything if
+ever enabled for this type.
+
+**What doesn't break:** proximity/"nearby" search and sorting run entirely off
+`lat`/`lng` in the `mylisting_locations` table (populated correctly by
+`_save_location_native()`), independent of any taxonomy — unaffected by this gap.
+
+**Unverified:** whether the `region` field preset is even enabled on the `cc` listing
+type is per-type config stored as postmeta on the `case27_listing_type` post (DB state,
+not code) — no wp-cli/DB access was available to check it in this pass.
+
 ---
 
 ## Appendix A — Status of `CT-FLOW-DETAILED-SPEC.md`
