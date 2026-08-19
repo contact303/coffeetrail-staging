@@ -101,6 +101,17 @@ $map_options = wp_json_encode( [
 		</div>
 	</div>
 
+	<?php /*
+		Roadside checkbox — omitted entirely in edit mode (not just hidden).
+		Its stored value carries no information about what the user actually
+		chose (see FINDINGS.md R10: _save_taxonomies() assigns whichever 'road'
+		term happens to be first in the taxonomy, not one derived from this
+		checkbox), so there is nothing honest to hydrate it with here. Leaving
+		the field out — rather than rendering it unchecked, which would itself
+		be a guess — also means collectStepFields() never posts a value for
+		it, so saving this screen cannot touch the 'road' taxonomy term.
+	*/ ?>
+	<?php if ( empty( $is_edit_mode ) ) : ?>
 	<!-- Roadside checkbox -->
 	<div class="ct-field-group">
 		<label class="ct-checkbox-item">
@@ -113,6 +124,7 @@ $map_options = wp_json_encode( [
 			</span>
 		</label>
 	</div>
+	<?php endif ?>
 
 	<!-- Location link (optional) -->
 	<div class="ct-field-group">

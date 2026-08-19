@@ -16,10 +16,20 @@
  *   @var bool        $next_hidden     Whether Next button is hidden (e.g. payment step).
  *   @var string      $next_label      Label for the Next button.
  *   @var string      $footer_message  Optional validation message between buttons.
+ *   @var bool        $suppress_footer Skip rendering entirely — used when several step
+ *                                     templates are composed onto one screen (edit mode)
+ *                                     and only one shared footer, included explicitly by
+ *                                     the composing template, should render.
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
+}
+
+// Composed multi-step screens (edit mode) render their own single footer explicitly
+// after including each step body — skip each step's own trailing include here.
+if ( ! empty( $suppress_footer ) ) {
+	return;
 }
 
 $prev_step      = $prev_step      ?? CT_Flow_Wizard_Controller::prev_step( $current_step, $listing_package );

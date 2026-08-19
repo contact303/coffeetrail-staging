@@ -1173,6 +1173,10 @@ body.ct-modal-open {
     padding: 0;
 }
 
+.ct-intro-screen.ct-intro-screen--3{
+    flex-direction: row-reverse;
+}
+
 /* Image column — LEFT side. In RTL flex, higher order = leftmost. */
 .ct-intro-screen__image-col {
     flex: 0 0 46%;
@@ -1322,6 +1326,10 @@ display: block;
     background: #f0fdf4;
     border: 1px solid #b9f8cf;
     border-radius: 14px;
+    width: 100%;
+    max-width: max-content;
+    align-self: flex-start;
+    margin-block-end: 20px;
 }
 .ct-intro-screen--3 .ct-intro-screen__badge-title {
     color: #0d542b;
@@ -1340,7 +1348,7 @@ display: block;
     box-shadow: 0 10px 15px -3px rgba(0,0,0,.10), 0 4px 6px -4px rgba(0,0,0,.10);
 }
 .ct-intro-screen--3 .ct-intro-screen__image-card {
-    padding: 16px;
+    padding: 0;
     box-shadow: 0 4px 10px rgba(0,0,0,.08);
 }
 .ct-intro-screen--3 .ct-intro-screen__image-card .ct-intro-screen__image {
@@ -1383,7 +1391,7 @@ display: block;
 .ct-welcome-intro {
     max-width: 620px;
     margin: 0 auto;
-    padding: 60px 24px 40px;
+    padding: 0 24px 40px;
     text-align: center;
 }
 

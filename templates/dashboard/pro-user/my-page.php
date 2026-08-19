@@ -137,9 +137,9 @@ $has_multiple   = $listings_count > 1;
     <h2 class="ct-public-card__title">
      על העגלה
     </h2>
-    <button class="ct-public-card__edit-button">
+    <a href="<?php echo esc_url( CT_Flow_Wizard_Edit::get_card_edit_url( 'about', $listing_id ) ); ?>" class="ct-public-card__edit-button">
      עריכת פרטי העמוד
-    </button>
+    </a>
    </div>
    <div class="ct-public-about__details">
     <div class="ct-public-about__detail">

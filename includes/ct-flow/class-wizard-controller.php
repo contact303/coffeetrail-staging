@@ -1305,4 +1305,95 @@ class CT_Flow_Wizard_Controller {
 			);
 		}
 	}
+
+	// =========================================================================
+	// Edit-mode support (CT_Flow_Wizard_Edit)
+	//
+	// The edit-mode "merged card" screen (basics + contact + location composed
+	// onto one screen, see class-wizard-edit.php) is deliberately NOT a variant
+	// of the AJAX handlers above — it never touches the per-user transient, has
+	// no next-step concept, and validates/saves several steps' worth of fields
+	// in one request. Rather than fork the taxonomy/postmeta/table logic those
+	// handlers already use, these two methods are thin public entry points into
+	// the existing private validate/persist/save helpers, reused unmodified.
+	// =========================================================================
+
+	/**
+	 * Validate a merged set of posted fields against every step's rules in
+	 * $steps, collecting all errors instead of stopping at the first step
+	 * that fails — the merged screen shows every problem in one response.
+	 *
+	 * Each existing _validate_step() case only reads the POST keys it cares
+	 * about (e.g. the 'contact' case only touches phone/whatsapp/ct_admin_phone),
+	 * so passing the same raw $fields blob to every step's validator is safe:
+	 * nothing cross-contaminates between steps.
+	 *
+	 * @param string[] $steps      Step keys to validate against, e.g. ['basics','contact','location'].
+	 * @param array    $raw_fields Raw POST fields (not yet sanitized — mirrors
+	 *                             ajax_save_step(), which also validates before sanitizing).
+	 * @return string[]  Merged error messages from every step, empty if all steps passed.
+	 */
+	public static function validate_edit_fields( array $steps, array $raw_fields ): array {
+		$errors = [];
+
+		foreach ( $steps as $step ) {
+			$errors = array_merge( $errors, self::_validate_step( $step, $raw_fields ) );
+		}
+
+		return $errors;
+	}
+
+	/**
+	 * Persist a merged set of already-validated, raw-posted fields, grouped
+	 * by the step they belong to, using exactly the same draft-meta +
+	 * native-saver pipeline a normal in-wizard step save uses once a listing
+	 * is public (compare _sync_published_step()'s 'basics', 'contact', and
+	 * 'location' cases) — just fired together in one request instead of
+	 * across separate step navigations.
+	 *
+	 * Callers build $raw_fields_by_step with only the step keys they collected
+	 * data for; any step's data absent from it is a no-op in every one of the
+	 * native savers below (each is individually gated on its own fields being
+	 * present), so a caller that only ever sends 'basics'/'contact'/'location'
+	 * cannot touch taxonomies or postmeta belonging to other steps (images,
+	 * amenities, menu-categories, hours, etc.) — including, deliberately, the
+	 * 'road' taxonomy: if the caller never populates
+	 * $raw_fields_by_step['location']['ct_roadside'], the existing
+	 * _save_taxonomies() road-assignment branch stays a no-op and the
+	 * listing's current 'road' term is left untouched.
+	 *
+	 * @param int   $job_id
+	 * @param array $raw_fields_by_step  e.g. ['basics' => [...], 'contact' => [...], 'location' => [...]].
+	 *                                    Each inner array is the RAW (not yet sanitized) field
+	 *                                    set for that step, already validated via
+	 *                                    validate_edit_fields() — sanitization happens here,
+	 *                                    the same point in the pipeline ajax_save_step() does it.
+	 * @return void
+	 */
+	public static function persist_edit_card( int $job_id, array $raw_fields_by_step ): void {
+		$fields_by_step = [];
+		foreach ( $raw_fields_by_step as $step => $raw_fields ) {
+			$fields_by_step[ $step ] = self::_sanitize_fields( $raw_fields );
+		}
+
+		// Draft-meta mirror: same per-step writer the build flow uses for every
+		// step save, so the wizard's own copies (_phone, _address, etc.) stay
+		// in sync with whatever the native savers below write.
+		foreach ( $fields_by_step as $step => $fields ) {
+			self::_persist_fields_to_draft( $job_id, $step, $fields );
+		}
+
+		$state = [ 'data' => $fields_by_step ];
+
+		$listing = \MyListing\Src\Listing::get( $job_id );
+		if ( ! $listing ) {
+			mlog()->warn( '[CT Wizard Edit] persist_edit_card: could not load Listing object for post #' . $job_id );
+			return;
+		}
+
+		self::_save_taxonomies( $job_id, $state );      // basics.cart_type -> 'type' (ct_roadside/menu_categories/amenities absent -> no-op)
+		self::_save_files_native( $job_id, $state );     // basics.job_logo -> _job_logo GUID
+		self::_save_location_native( $job_id, $listing, $state ); // location.address/lat/lng -> mylisting_locations table
+		self::_save_simple_fields( $job_id, $state );    // contact.* + location.ct_location_link
+	}
 }

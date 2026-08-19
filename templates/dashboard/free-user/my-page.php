@@ -115,7 +115,7 @@ $has_multiple   = $listings_count > 1;
               <div class="ct-preview-card ct-preview-about">
                 <div class="ct-preview-card__header">
                   <h2 class="ct-preview-card__title">על העגלה</h2>
-                  <a href="/add-listing/" class="ct-preview-card__edit-button">עריכת פרטי העמוד</a>
+                  <a href="<?php echo esc_url( CT_Flow_Wizard_Edit::get_card_edit_url( 'about', $listing_id ) ); ?>" class="ct-preview-card__edit-button">עריכת פרטי העמוד</a>
                 </div>
                 <div class="ct-preview-about__details">
                   <?php if ( ! empty( $location_coffee ) ) : ?>

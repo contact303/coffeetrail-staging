@@ -37,6 +37,7 @@ require_once CT_FLOW_DIR . '/class-grow-payment.php';
 require_once CT_FLOW_DIR . '/class-grow-webhook.php';
 require_once CT_FLOW_DIR . '/class-wizard-controller.php';
 require_once CT_FLOW_DIR . '/class-wizard-page.php';
+require_once CT_FLOW_DIR . '/class-wizard-edit.php';
 
 // class-terms-step.php is retained for the edit-listing flow (existing listings).
 // The wizard's own terms.php template handles the submission flow instead.
@@ -58,3 +59,4 @@ CT_Grow_Payment::init();
 CT_Grow_Webhook::init();
 CT_Flow_Wizard_Controller::init();
 CT_Flow_Wizard_Page::init();
+CT_Flow_Wizard_Edit::init();

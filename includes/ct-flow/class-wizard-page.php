@@ -250,6 +250,22 @@ class CT_Flow_Wizard_Page {
 	}
 
 	/**
+	 * Public entry point onto the same Elementor/theme-chrome stripping
+	 * wizard-shell.php uses, for any other minimal full-document page in this
+	 * module that also calls wp_head()/wp_footer() directly with no
+	 * surrounding Elementor page (currently: the edit-mode card shell in
+	 * CT_Flow_Wizard_Edit). Kept as a thin wrapper rather than duplicating
+	 * dequeue_wizard_shell_assets()'s Elementor-specific handle lists and
+	 * popup-module handling a second time.
+	 *
+	 * @return void
+	 */
+	public static function prepare_minimal_shell_assets(): void {
+		self::$_wizard_shell_mode = true;
+		self::_prepare_wizard_shell_assets();
+	}
+
+	/**
 	 * Dequeue scripts/styles that require a full Elementor page or theme chrome.
 	 *
 	 * @return void
@@ -382,13 +398,25 @@ class CT_Flow_Wizard_Page {
 	 * @param string $listing_package
 	 * @param array  $state
 	 * @param int    $job_id
+	 * @param bool   $is_edit_mode     True when rendering inside the edit-mode merged
+	 *                                 screen (see CT_Flow_Wizard_Edit) rather than the
+	 *                                 normal build flow. Passed through into the
+	 *                                 template's include scope so a template (e.g.
+	 *                                 location.php's roadside field) can omit markup
+	 *                                 that can't be rendered honestly in edit mode.
+	 * @param bool   $suppress_footer  True to skip the template's own trailing
+	 *                                 footer.php include — used when several step
+	 *                                 templates are being composed onto one screen and
+	 *                                 only one shared footer should render.
 	 * @return string  Rendered HTML.
 	 */
 	public static function render_step(
 		string $step_key,
 		string $listing_package,
 		array  $state,
-		int    $job_id = 0
+		int    $job_id = 0,
+		bool   $is_edit_mode = false,
+		bool   $suppress_footer = false
 	): string {
 		$template_name = CT_Flow_Wizard_Controller::get_template( $step_key );
 		$template_path = CT_FLOW_DIR . '/templates/wizard/' . $template_name . '.php';
@@ -403,6 +431,8 @@ class CT_Flow_Wizard_Page {
 		$state           = $state;
 		$job_id          = $job_id;
 		$has_draft       = CT_Flow_Wizard_Controller::has_draft();
+		$is_edit_mode    = $is_edit_mode;
+		$suppress_footer = $suppress_footer;
 
 		ob_start();
 		include $template_path;

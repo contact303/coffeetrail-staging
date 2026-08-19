@@ -40,6 +40,14 @@
         cropperInstances: {},         // field_key => Cropper instance
         uploadQueue: [],
         processingQueue: false,
+        // Edit mode (CT_Flow_Wizard_Edit): a stateless "save this card, return to the
+        // dashboard" screen, distinct from the normal build flow. isEditMode gates the
+        // one guarded branch in bindNavigation()'s next-button handler below; the build
+        // flow's #ct-wizard-container never sets these data attributes, so they default
+        // falsy/empty and every other code path here is unaffected.
+        isEditMode: false,
+        editCard: '',
+        editReturnUrl: '',
     };
 
     // =========================================================================
@@ -76,6 +84,9 @@
         WizardState.currentStep     = $container.data('step')    || '';
         WizardState.listingPackage  = $container.data('package') || 'free';
         WizardState.jobId           = parseInt($container.data('job-id'), 10) || 0;
+        WizardState.isEditMode      = !!$container.data('edit-mode');
+        WizardState.editCard        = $container.data('edit-card')       || '';
+        WizardState.editReturnUrl   = $container.data('edit-return-url') || '';
 
         bindNavigation();
         bindModals();
@@ -172,6 +183,16 @@
         $(document).on('click', SEL.nextBtn, function () {
             if ($(this).hasClass('ct-wizard-btn--disabled') ||
                 $(this).attr('aria-disabled') === 'true') {
+                return;
+            }
+            // Edit mode (CT_Flow_Wizard_Edit): the footer's "next" button is reused
+            // as "save and return" here (footer.php's $next_label override — see
+            // the edit-card shell template), but it must never fall through into
+            // the build flow's handleNext()/saveStepAndAdvance(), which validate a
+            // single WizardState.currentStep and save through the per-user
+            // transient this feature deliberately bypasses.
+            if (WizardState.isEditMode) {
+                saveEditCardAndReturn();
                 return;
             }
             WizardState.validationTriggered = true;
@@ -527,6 +548,56 @@
                 loadStep(response.data.next_step);
             } else {
                 const errors = response.data.errors || ['אירעה שגיאה. אנא נסו שוב.'];
+                showStepErrors(errors);
+            }
+        })
+        .fail(function () {
+            showStepErrors(['שגיאת תקשורת. אנא בדקו את החיבור לאינטרנט ונסו שוב.']);
+        })
+        .always(function () {
+            setLoading(false);
+        });
+    }
+
+    // =========================================================================
+    // AJAX: Save edit-mode card and return to dashboard
+    // =========================================================================
+
+    /**
+     * Edit mode's equivalent of saveStepAndAdvance() — save every field
+     * currently on screen (the card's merged step templates) in one request
+     * and redirect back to the dashboard. No next-step, no loadStep(), no
+     * transient. Kept entirely separate from saveStepAndAdvance() rather than
+     * branching inside it, so the build flow's save path is untouched by this
+     * function's existence.
+     *
+     * Validation is server-side only here (see CT_Flow_Wizard_Controller::
+     * validate_edit_fields()) — errors come back the same shape
+     * saveStepAndAdvance() already handles (response.data.errors), so
+     * showStepErrors() is reused unchanged.
+     */
+    function saveEditCardAndReturn() {
+        const fields = collectStepFields();
+
+        setLoading(true);
+
+        $.ajax({
+            url:    ctWizard.ajaxUrl,
+            method: 'POST',
+            data: {
+                action:  'ct_wizard_save_edit_card',
+                nonce:   ctWizard.nonce,
+                card:    WizardState.editCard,
+                job_id:  WizardState.jobId,
+                fields:  fields,
+            },
+        })
+        .done(function (response) {
+            if (response.success) {
+                window.location.href = response.data.redirect || WizardState.editReturnUrl;
+            } else {
+                const errors = response.data.errors ||
+                    [response.data.message || 'אירעה שגיאה. אנא נסו שוב.'];
                 showStepErrors(errors);
             }
         })
