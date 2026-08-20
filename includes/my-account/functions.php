@@ -476,26 +476,31 @@ function account_menu_per_listing_plan() {
     $current_endpoint_value = get_query_var( $plan_slug );
     $current_page           = ct_get_nested_account_page( $plan_slug );
 
-    $owner_meta = get_post_meta(
-        $listing_id,
-        '_coffeecart-owner',
-        true
-    );
+    $owner_meta = get_post_meta( $listing_id, '_coffeecart-owner', true );
 
-    $coffeecart_owner = is_array( $owner_meta )
-        ? ( $owner_meta[0] ?? '' )
-        : $owner_meta;
-
-    $owner_image_url = '';
-
-    if ( is_numeric( $coffeecart_owner ) ) {
-        $owner_image_url = wp_get_attachment_image_url(
-            absint( $coffeecart_owner ),
-            'thumbnail'
-        );
-    } elseif ( is_string( $coffeecart_owner ) ) {
-        $owner_image_url = $coffeecart_owner;
+    if ( empty( $owner_meta ) ) {
+        $owner_meta = get_post_meta( $listing_id, '_job_logo', true );
     }
+
+    $owner_value = '';
+
+    if ( is_array( $owner_meta ) ) {
+        $owner_value = $owner_meta[0] ?? '';
+    } else {
+        $owner_value = $owner_meta;
+    }
+
+    if ( is_string( $owner_value ) ) {
+        $maybe_unserialized = maybe_unserialize( $owner_value );
+
+        if ( is_array( $maybe_unserialized ) ) {
+            $owner_value = $maybe_unserialized[0] ?? '';
+        }
+    }
+
+    $owner_image_url = is_string( $owner_value )
+        ? $owner_value
+        : '';
     
     ?>
 
