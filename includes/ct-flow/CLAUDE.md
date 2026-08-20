@@ -99,6 +99,34 @@ author's transient, override package from `_ct_listing_package`, run
 `_ct_pending_changes` queued by `CT_Flow_Selective_Approval` on **edit-listing**
 submissions only.
 
+**Edit mode (dashboard card editing) — ON HOLD, partially built.** A stateless,
+per-request path separate from the build flow above: `CT_Flow_Wizard_Edit`
+(`class-wizard-edit.php`) intercepts `/add-listing/?ct_edit_card={card}&job_id={id}`
+on `template_redirect` **priority 0** — before the build flow's priority-1 hook —
+so it never touches the per-user transient or `STEPS` navigation. **Built and
+working**: the `about` card (basics + contact + location merged into one screen
+via `CT_Flow_Wizard_Page::render_step()`'s `$is_edit_mode`/`$suppress_footer`
+params, each step's own trailing footer suppressed in favor of one shared
+`footer.php` include at the end); ownership checks at both the page
+(`maybe_output_edit_card`) and AJAX (`ajax_save_edit_card`) entry points;
+`ct_roadside` excluded from the merged screen entirely — its markup, not just
+its displayed value (R10); header group-indicator and save-exit/help buttons
+suppressed in edit mode; save writes straight to postmeta/taxonomy/table and
+redirects back to the dashboard (no next-step, no admin approval). **Deliberately
+deferred**: every other dashboard card (cover, story, gallery, social links,
+menu, hours, features, info) and their hydration; a tier gate inside edit mode
+itself — today's one card is free-tier only, and tier eligibility is left to
+the existing account-dashboard route redirect (`includes/my-account/functions.php`'s
+`woocommerce_account_free_endpoint`/`pro_endpoint`), not re-checked here — see
+the class's own docblock for the reasoning. **Blockers before extending to more
+cards**: R1 (hours data is corrupted by the build flow itself — nothing to
+hydrate honestly until that's fixed) and R10 (`ct_roadside`'s stored value
+carries no reconstructable information — the same reason it's excluded from
+the `about` card today). **The merged-screen approach — composing several step
+templates onto one dashboard-card screen, rather than one wizard step per
+dashboard link — is a confirmed client decision.** A future session picking
+this back up should not "simplify" it back to a one-step-per-link model.
+
 ---
 
 ## 2. Field → storage map
@@ -224,6 +252,7 @@ implemented but incomplete/unverified (note says what would settle it) ·
 - ~~Add `basics` and `location` cases to `_sync_published_step()`~~ — **done (R20)**. Section C's prerequisite is cleared.
 - Fix the remaining 19 `mlog()->error()`/`mlog()->warning()` call sites across the module so error handling actually degrades gracefully instead of fataling (R24).
 - Decide whether `cc` listings need the `region` taxonomy (search filter, quick search, `/explore/regions/...`) and, if so, add a region step/field to the wizard — no assignment path exists today, native or ct-flow (R25).
+- Edit mode (dashboard card editing) is **on hold, partially built** — the `about` card (basics/contact/location) works end to end; every other card still needs building, blocked on R1 for hours and R10 for `ct_roadside`. See §1's "Edit mode" note for what's built vs. deferred.
 
 **B. Hardening required before go-live**
 - Server-side tier verification — stop trusting client-posted `package` for assignment.
